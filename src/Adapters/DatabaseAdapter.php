@@ -152,7 +152,9 @@ class DatabaseAdapter implements DatabaseAdapterContract
         $instance = $this->eloquent->where('ptype', $ptype);
         foreach (range(0, 5) as $value) {
             if ($fieldIndex <= $value && $value < $fieldIndex + count($fieldValues)) {
-                $instance->where('v'.strval($value), $fieldValues[$value - $fieldIndex]);
+                if ('' != $fieldValues[$value - $fieldIndex]) {
+                    $instance->where('v'.strval($value), $fieldValues[$value - $fieldIndex]);
+                }
             }
         }
 
