@@ -11,7 +11,7 @@
     "license": "Apache-2.0",
     "require": {
     	"laravel/framework": "~5.1",
-    	"casbin/casbin": ">=0.2.1"
+    	"casbin/casbin": "~1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~5.7|~6.0|~7.0|~8.0",
