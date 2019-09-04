@@ -18,6 +18,13 @@ class Rule extends Model
     protected $store;
 
     /**
+     * the guard for lauthz.
+     *
+     * @var string
+     */
+    protected $guard;
+
+    /**
      * Fillable.
      *
      * @var array
@@ -27,10 +34,16 @@ class Rule extends Model
     /**
      * Create a new Eloquent model instance.
      *
-     * @param array $attributes
+     * @param array  $attributes
+     * @param string $guard
      */
-    public function __construct(array $attributes = [])
+    public function __construct(array $attributes = [], $guard = '')
     {
+        $this->guard = $guard;
+        if (!$guard) {
+            $this->guard = config('lauthz.default');
+        }
+
         $connection = $this->config('database.connection') ?: config('database.default');
 
         $this->setConnection($connection);
@@ -84,7 +97,6 @@ class Rule extends Model
      */
     protected function initCache()
     {
-        $driver = config('lauthz.default');
         $store = $this->config('cache.store', 'default');
         $store = 'default' == $store ? null : $store;
         $this->store = Cache::store($store);
@@ -100,8 +112,6 @@ class Rule extends Model
      */
     protected function config($key = null, $default = null)
     {
-        $driver = config('lauthz.default');
-
-        return config('lauthz.'.$driver.'.'.$key, $default);
+        return config('lauthz.'.$this->guard.'.'.$key, $default);
     }
 }

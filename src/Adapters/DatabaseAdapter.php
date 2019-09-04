@@ -37,8 +37,6 @@ class DatabaseAdapter implements DatabaseAdapterContract
      *
      * @param string $ptype
      * @param array  $rule
-     *
-     * @return void
      */
     public function savePolicyLine($ptype, array $rule)
     {

@@ -4,6 +4,7 @@ namespace Lauthz\Middlewares;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Lauthz\Exceptions\UnauthorizedException;
 use Lauthz\Facades\Enforcer;
 
@@ -13,49 +14,53 @@ use Lauthz\Facades\Enforcer;
 class RequestMiddleware
 {
     /**
-     * The authentication factory instance.
-     *
-     * @var \Illuminate\Contracts\Auth\Factory
-     */
-    protected $auth;
-
-    /**
-     * Create a new middleware instance.
-     *
-     * @param \Illuminate\Contracts\Auth\Factory $auth
-     *
-     * @return void
-     */
-    public function __construct(Auth $auth)
-    {
-        $this->auth = $auth;
-    }
-
-    /**
      * Handle an incoming request.
      *
      * @param \Illuminate\Http\Request $request
      * @param \Closure                 $next
-     * @param mixed                    ...$args
+     * @param mixed                    ...$guards
      *
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, ...$guards)
     {
         if (Auth::guest()) {
             throw new UnauthorizedException();
         }
 
+        $this->authorize($request, $guards);
+
+        return $next($request);
+    }
+
+    /**
+     * Determine if the user is authorized in to any of the given guards.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param array                    $guards
+     *
+     * @throws \Lauthz\Exceptions\UnauthorizedException
+     */
+    protected function authorize(Request $request, array $guards)
+    {
         $user = Auth::user();
         $identifier = $user->getAuthIdentifier();
         if (method_exists($user, 'getAuthzIdentifier')) {
             $identifier = $user->getAuthzIdentifier();
         }
 
-        if (!Enforcer::enforce($identifier, $request->getPathInfo(), $request->method())) {
-            throw new UnauthorizedException();
+        if (empty($guards)) {
+            if (Enforcer::enforce($identifier, $request->getPathInfo(), $request->method())) {
+                return;
+            }
         }
 
-        return $next($request);
+        foreach ($guards as $guard) {
+            if (Enforcer::guard($guard)->enforce($identifier, $request->getPathInfo(), $request->method())) {
+                return Enforcer::shouldUse($guard);
+            }
+        }
+
+        throw new UnauthorizedException();
     }
 }
