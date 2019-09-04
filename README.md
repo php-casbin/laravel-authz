@@ -222,6 +222,8 @@ Determines whether a user has a permission.
 Enforcer::hasPermissionForUser('eve', 'articles', 'read');  // true or false
 ```
 
+See [Casbin API](https://casbin.org/docs/en/management-api) for more APIs.
+
 ### Using a middleware
 
 This package comes with `EnforcerMiddleware`, `RequestMiddleware` middlewares. You can add them inside your `app/Http/Kernel.php` file.
