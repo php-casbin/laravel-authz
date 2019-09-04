@@ -3,25 +3,25 @@
 </h1>
 
 <p align="center">
-	<strong>Laravel-authz is an authorization library for the laravel framework.</strong>    
+    <strong>Laravel-authz is an authorization library for the laravel framework.</strong>    
 </p>
 
 <p align="center">
-	<a href="https://travis-ci.org/php-casbin/laravel-authz">
-		<img src="https://travis-ci.org/php-casbin/laravel-authz.svg?branch=master" alt="Build Status">
-  	</a>
-	<a href="https://coveralls.io/github/php-casbin/laravel-authz">
-		<img src="https://coveralls.io/repos/github/php-casbin/laravel-authz/badge.svg" alt="Coverage Status">
-  	</a>
+    <a href="https://travis-ci.org/php-casbin/laravel-authz">
+        <img src="https://travis-ci.org/php-casbin/laravel-authz.svg?branch=master" alt="Build Status">
+    </a>
+    <a href="https://coveralls.io/github/php-casbin/laravel-authz">
+        <img src="https://coveralls.io/repos/github/php-casbin/laravel-authz/badge.svg" alt="Coverage Status">
+    </a>
     <a href="https://packagist.org/packages/casbin/laravel-authz">
-		<img src="https://poser.pugx.org/casbin/laravel-authz/v/stable" alt="Latest Stable Version">
-  	</a>
+        <img src="https://poser.pugx.org/casbin/laravel-authz/v/stable" alt="Latest Stable Version">
+    </a>
      <a href="https://packagist.org/packages/casbin/laravel-authz">
-		<img src="https://poser.pugx.org/casbin/laravel-authz/downloads" alt="Total Downloads">
-  	</a>
+        <img src="https://poser.pugx.org/casbin/laravel-authz/downloads" alt="Total Downloads">
+    </a>
     <a href="https://packagist.org/packages/casbin/laravel-authz">
-		<img src="https://poser.pugx.org/casbin/laravel-authz/license" alt="License">
-  	</a>
+        <img src="https://poser.pugx.org/casbin/laravel-authz/license" alt="License">
+    </a>
 </p>
 
 It's based on [Casbin](https://github.com/php-casbin/php-casbin), an authorization library that supports access control models like ACL, RBAC, ABAC.
@@ -35,6 +35,7 @@ All you need to learn to use `Casbin` first.
   * [Using a middleware](#using-a-middleware)
     * [basic Enforcer Middleware](#basic-enforcer-middleware)
     * [HTTP Request Middleware ( RESTful is also supported )](#http-request-middleware--restful-is-also-supported-)
+  * [Multiple enforcers](#multiple-enforcers)
   * [Using artisan commands](#using-artisan-commands)
   * [Cache](#using-cache)
 * [Thinks](#thinks)
@@ -273,6 +274,44 @@ Route::group(['middleware' => ['http_request']], function () {
     Route::resource('photo', 'PhotoController');
 });
 ```
+
+### Multiple enforcers
+
+If you need multiple permission controls in your project, you can configure multiple enforcers.
+
+In the lauthz file, it should be like this:
+
+```php
+return [
+    'default' => 'basic',
+
+    'basic' => [
+        'model' => [
+            // ...
+        ],
+
+        'adapter' => Lauthz\Adapters\DatabaseAdapter::class,
+        // ...
+    ],
+
+    'second' => [
+        'model' => [
+            // ...
+        ],
+
+        'adapter' => Lauthz\Adapters\DatabaseAdapter::class,
+        // ...
+    ],
+];
+
+```
+
+Then you can choose which enforcers to use.
+
+```php
+Enforcer::guard('second')->enforce("eve", "articles", "edit");
+```
+
 
 ### Using artisan commands
 
