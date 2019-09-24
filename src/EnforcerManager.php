@@ -2,6 +2,7 @@
 
 namespace Lauthz;
 
+use Casbin\Bridge\Logger\LoggerBridge;
 use Casbin\Enforcer;
 use Casbin\Model\Model;
 use Casbin\Log\Log;
@@ -77,7 +78,11 @@ class EnforcerManager implements Factory
         }
 
         if ($logger = Arr::get($config, 'log.logger')) {
-            Log::setLogger(new $logger($this->app['log']));
+            if (is_string($logger)) {
+                $logger = $this->app->make($logger);
+            }
+
+            Log::setLogger(new LoggerBridge($logger));
         }
 
         $model = new Model();
