@@ -12,53 +12,43 @@ services:
 matrix:
   fast_finish: true
   include:
-  # Laravel 5.1
-  - php: 5.6
-    env: LARAVEL=5.1.* PHPUNIT=^5.7
-  - php: 7.0
-    env: LARAVEL=5.1.* PHPUNIT=^5.7
-  - php: 7.1
-    env: LARAVEL=5.1.* PHPUNIT=^5.7
+    # Laravel 5.5  
+    - php: 7.1
+      env: LARAVEL=5.5.* PHPUNIT=~6.0
+    - php: 7.2
+      env: LARAVEL=5.5.* PHPUNIT=~6.0
+    - php: 7.3
+      env: LARAVEL=5.5.* PHPUNIT=~6.0
 
-  # Laravel 5.5  
-  - php: 7.0
-    env: LARAVEL=5.5.* PHPUNIT=~6.0
-  - php: 7.1
-    env: LARAVEL=5.5.* PHPUNIT=~6.0
-  - php: 7.2
-    env: LARAVEL=5.5.* PHPUNIT=~6.0
-  - php: 7.3
-    env: LARAVEL=5.5.* PHPUNIT=~6.0
+    # Laravel 5.6
+    - php: 7.1
+      env: LARAVEL=5.6.* PHPUNIT=~7.0
+    - php: 7.2
+      env: LARAVEL=5.6.* PHPUNIT=~7.0
+    - php: 7.3
+      env: LARAVEL=5.6.* PHPUNIT=~7.0
 
-  # Laravel 5.6
-  - php: 7.1
-    env: LARAVEL=5.6.* PHPUNIT=~7.0
-  - php: 7.2
-    env: LARAVEL=5.6.* PHPUNIT=~7.0
-  - php: 7.3
-    env: LARAVEL=5.6.* PHPUNIT=~7.0
+    # Laravel 5.7
+    - php: 7.1
+      env: LARAVEL=5.7.* PHPUNIT=~7.5
+    - php: 7.2
+      env: LARAVEL=5.7.* PHPUNIT=~7.5
+    - php: 7.3
+      env: LARAVEL=5.7.* PHPUNIT=~7.5
 
-  # Laravel 5.7
-  - php: 7.1
-    env: LARAVEL=5.7.* PHPUNIT=~7.5
-  - php: 7.2
-    env: LARAVEL=5.7.* PHPUNIT=~7.5
-  - php: 7.3
-    env: LARAVEL=5.7.* PHPUNIT=~7.5
+    # Laravel 5.8
+    - php: 7.1
+      env: LARAVEL=5.8.* PHPUNIT=~7.5
+    - php: 7.2
+      env: LARAVEL=5.8.* PHPUNIT=~8.0
+    - php: 7.3
+      env: LARAVEL=5.8.* PHPUNIT=~8.0
 
-  # Laravel 5.8
-  - php: 7.1
-    env: LARAVEL=5.8.* PHPUNIT=~7.5
-  - php: 7.2
-    env: LARAVEL=5.8.* PHPUNIT=~8.0
-  - php: 7.3
-    env: LARAVEL=5.8.* PHPUNIT=~8.0
-    
-  # Laravel 6.0
-  - php: 7.2
-    env: LARAVEL=6.0.* PHPUNIT=~8.0
-  - php: 7.3
-    env: LARAVEL=6.0.* PHPUNIT=~8.0
+    # Laravel 6.0
+    - php: 7.2
+      env: LARAVEL=6.0.* PHPUNIT=~8.0
+    - php: 7.3
+      env: LARAVEL=6.0.* PHPUNIT=~8.0
     
 before_install:  
   - travis_retry composer self-update
@@ -70,9 +60,9 @@ install:
   - travis_retry composer install --no-suggest --no-interaction
 
 script:
- - vendor/bin/phpunit --version
- - mkdir -p build/logs
- - vendor/bin/phpunit
+  - vendor/bin/phpunit --version
+  - mkdir -p build/logs
+  - vendor/bin/phpunit
 
 after_script:
- - travis_retry vendor/bin/php-coveralls -v
+  - travis_retry vendor/bin/php-coveralls -v

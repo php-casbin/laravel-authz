@@ -34,13 +34,9 @@ abstract class TestCase extends BaseTestCase
         $this->artisan('vendor:publish', ['--provider' => 'Lauthz\LauthzServiceProvider']);
         $this->artisan('migrate', ['--force' => true]);
 
-        if (method_exists($this, 'afterApplicationCreated')) {
-            $this->afterApplicationCreated(function () {
-                $this->initTable();
-            });
-        } else {
+        $this->afterApplicationCreated(function () {
             $this->initTable();
-        }
+        });
 
         return $this->app;
     }
