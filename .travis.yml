@@ -44,12 +44,18 @@ matrix:
     - php: 7.3
       env: LARAVEL=5.8.* PHPUNIT=~8.0
 
-    # Laravel 6.0
+    # Laravel 6.x
     - php: 7.2
-      env: LARAVEL=6.0.* PHPUNIT=~8.0
+      env: LARAVEL=6.* PHPUNIT=~8.0
     - php: 7.3
-      env: LARAVEL=6.0.* PHPUNIT=~8.0
+      env: LARAVEL=6.* PHPUNIT=~8.0
     
+    # Laravel 7.x
+    - php: 7.3
+      env: LARAVEL=7.* PHPUNIT=~9.0
+    - php: 7.4
+      env: LARAVEL=7.* PHPUNIT=~9.0
+
 before_install:  
   - travis_retry composer self-update
   - travis_retry composer require laravel/framework:$LARAVEL --no-update --no-interaction
