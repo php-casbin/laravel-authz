@@ -87,6 +87,17 @@ jobs:
             laravel: 7.*
             phpunit: ~9.0
 
+          # Laravel 8.x
+          - php: 7.3
+            laravel: 8.*
+            phpunit: ~9.0
+          - php: 7.4
+            laravel: 8.*
+            phpunit: ~9.0
+          - php: 8.0
+            laravel: 8.*
+            phpunit: ~9.0
+
     name: Laravel${{ matrix.laravel }}-PHP${{ matrix.php }}
 
     steps:
