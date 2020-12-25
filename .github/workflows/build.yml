@@ -23,9 +23,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-#        php: [ ]
-#        laravel: [ ]
-#        stability: [ prefer-lowest, prefer-stable ]
+        #        php: [ ]
+        #        laravel: [ ]
+        #        stability: [ prefer-lowest, prefer-stable ]
         include:
           # Laravel 5.5
           - php: 7.1
@@ -120,11 +120,30 @@ jobs:
           composer install --prefer-dist --no-progress --no-suggest
 
       - name: Run test suite
-        run: ./vendor/bin/phpunit
+        run: ./vendor/bin/phpunit -v
+
+      - name: Run Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_PARALLEL: true
+          COVERALLS_FLAG_NAME: ${{ runner.os }} - ${{ matrix.php }} - Laravel${{ matrix.laravel }}
+        run: |
+          composer global require php-coveralls/php-coveralls:^2.4
+          php-coveralls --coverage_clover=build/logs/clover.xml -v
+
+  upload-coverage:
+    runs-on: ubuntu-latest
+    needs: [ test ]
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
 
   semantic-release:
     runs-on: ubuntu-latest
-    needs: [ test ]
+    needs: [ test, upload-coverage ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
