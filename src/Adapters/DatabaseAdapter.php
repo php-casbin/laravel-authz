@@ -43,7 +43,7 @@ class DatabaseAdapter implements DatabaseAdapterContract
      */
     public function savePolicyLine(string $ptype, array $rule): void
     {
-        $col['ptype'] = $ptype;
+        $col['p_type'] = $ptype;
         foreach ($rule as $key => $value) {
             $col['v'.strval($key)] = $value;
         }
@@ -112,7 +112,7 @@ class DatabaseAdapter implements DatabaseAdapterContract
     {
         $count = 0;
 
-        $instance = $this->eloquent->where('ptype', $ptype);
+        $instance = $this->eloquent->where('p_type', $ptype);
 
         foreach ($rule as $key => $value) {
             $instance->where('v'.strval($key), $value);
@@ -138,7 +138,7 @@ class DatabaseAdapter implements DatabaseAdapterContract
     {
         $count = 0;
 
-        $instance = $this->eloquent->where('ptype', $ptype);
+        $instance = $this->eloquent->where('p_type', $ptype);
         foreach (range(0, 5) as $value) {
             if ($fieldIndex <= $value && $value < $fieldIndex + count($fieldValues)) {
                 if ('' != $fieldValues[$value - $fieldIndex]) {

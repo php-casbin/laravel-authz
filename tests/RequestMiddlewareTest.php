@@ -68,11 +68,11 @@ EOT;
     {
         Rule::truncate();
 
-        Rule::create(['ptype' => 'p', 'v0' => 'alice', 'v1' => '/foo', 'v2' => 'GET']);
-        Rule::create(['ptype' => 'p', 'v0' => 'alice', 'v1' => '/foo/:id', 'v2' => 'GET']);
-        Rule::create(['ptype' => 'p', 'v0' => 'alice', 'v1' => '/foo', 'v2' => 'POST']);
-        Rule::create(['ptype' => 'p', 'v0' => 'alice', 'v1' => '/foo/:id', 'v2' => 'PUT']);
-        Rule::create(['ptype' => 'p', 'v0' => 'alice', 'v1' => '/foo/:id', 'v2' => 'DELETE']);
-        Rule::create(['ptype' => 'p', 'v0' => 'alice', 'v1' => '/foo1/*', 'v2' => '(GET)|(POST)']);
+        Rule::create(['p_type' => 'p', 'v0' => 'alice', 'v1' => '/foo', 'v2' => 'GET']);
+        Rule::create(['p_type' => 'p', 'v0' => 'alice', 'v1' => '/foo/:id', 'v2' => 'GET']);
+        Rule::create(['p_type' => 'p', 'v0' => 'alice', 'v1' => '/foo', 'v2' => 'POST']);
+        Rule::create(['p_type' => 'p', 'v0' => 'alice', 'v1' => '/foo/:id', 'v2' => 'PUT']);
+        Rule::create(['p_type' => 'p', 'v0' => 'alice', 'v1' => '/foo/:id', 'v2' => 'DELETE']);
+        Rule::create(['p_type' => 'p', 'v0' => 'alice', 'v1' => '/foo1/*', 'v2' => '(GET)|(POST)']);
     }
 }

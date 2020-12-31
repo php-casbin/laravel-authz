@@ -13,7 +13,7 @@ class CreateRulesTable extends Migration
         $connection = config('lauthz.basic.database.connection') ?: config('database.default');
         Schema::connection($connection)->create(config('lauthz.basic.database.rules_table'), function (Blueprint $table) {
             $table->increments('id');
-            $table->string('ptype')->nullable();
+            $table->string('p_type')->nullable();
             $table->string('v0')->nullable();
             $table->string('v1')->nullable();
             $table->string('v2')->nullable();

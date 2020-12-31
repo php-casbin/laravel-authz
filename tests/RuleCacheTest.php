@@ -28,7 +28,7 @@ class RuleCacheTest extends TestCase
         app(Rule::class)->getAllFromCache();
         $this->assertCount(0, DB::getQueryLog());
 
-        $rule = Rule::create(['ptype' => 'p', 'v0' => 'alice', 'v1' => 'data1', 'v2' => 'read']);
+        $rule = Rule::create(['p_type' => 'p', 'v0' => 'alice', 'v1' => 'data1', 'v2' => 'read']);
         app(Rule::class)->getAllFromCache();
         $this->assertCount(2, DB::getQueryLog());
 
@@ -48,7 +48,7 @@ class RuleCacheTest extends TestCase
         app(Rule::class)->getAllFromCache();
         $this->assertCount(1, DB::getQueryLog());
 
-        $rule = Rule::create(['ptype' => 'p', 'v0' => 'alice', 'v1' => 'data1', 'v2' => 'read']);
+        $rule = Rule::create(['p_type' => 'p', 'v0' => 'alice', 'v1' => 'data1', 'v2' => 'read']);
         app(Rule::class)->getAllFromCache();
         $this->assertCount(3, DB::getQueryLog());
 

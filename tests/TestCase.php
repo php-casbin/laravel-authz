@@ -53,12 +53,12 @@ abstract class TestCase extends BaseTestCase
     {
         Rule::truncate();
 
-        Rule::create(['ptype' => 'p', 'v0' => 'alice', 'v1' => 'data1', 'v2' => 'read']);
-        Rule::create(['ptype' => 'p', 'v0' => 'bob', 'v1' => 'data2', 'v2' => 'write']);
+        Rule::create(['p_type' => 'p', 'v0' => 'alice', 'v1' => 'data1', 'v2' => 'read']);
+        Rule::create(['p_type' => 'p', 'v0' => 'bob', 'v1' => 'data2', 'v2' => 'write']);
 
-        Rule::create(['ptype' => 'p', 'v0' => 'data2_admin', 'v1' => 'data2', 'v2' => 'read']);
-        Rule::create(['ptype' => 'p', 'v0' => 'data2_admin', 'v1' => 'data2', 'v2' => 'write']);
-        Rule::create(['ptype' => 'g', 'v0' => 'alice', 'v1' => 'data2_admin']);
+        Rule::create(['p_type' => 'p', 'v0' => 'data2_admin', 'v1' => 'data2', 'v2' => 'read']);
+        Rule::create(['p_type' => 'p', 'v0' => 'data2_admin', 'v1' => 'data2', 'v2' => 'write']);
+        Rule::create(['p_type' => 'g', 'v0' => 'alice', 'v1' => 'data2_admin']);
     }
 
     protected function runMiddleware($middleware, $request, ...$args)
