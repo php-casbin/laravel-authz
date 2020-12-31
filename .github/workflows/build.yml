@@ -114,15 +114,6 @@ jobs:
       - name: Validate composer.json and composer.lock
         run: composer validate
 
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v2
-        with:
-          path: vendor
-          key: ${{ runner.os }}-${{ matrix.php }}-Laravel${{ matrix.laravel }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.php }}-Laravel${{ matrix.laravel }}
-
       - name: Install dependencies
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: |
