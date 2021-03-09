@@ -6,15 +6,16 @@ namespace Lauthz\Adapters;
 
 use Lauthz\Models\Rule;
 use Lauthz\Contracts\DatabaseAdapter as DatabaseAdapterContract;
+use Lauthz\Contracts\BatchDatabaseAdapter as BatchDatabaseAdapterContract;
 use Casbin\Model\Model;
 use Casbin\Persist\AdapterHelper;
-
+use DateTime;
 /**
  * DatabaseAdapter.
  *
  * @author techlee@qq.com
  */
-class DatabaseAdapter implements DatabaseAdapterContract
+class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterContract
 {
     use AdapterHelper;
 
@@ -101,6 +102,32 @@ class DatabaseAdapter implements DatabaseAdapterContract
         $this->savePolicyLine($ptype, $rule);
     }
 
+     /**
+     * Adds a policy rules to the storage.
+     * This is part of the Auto-Save feature.
+     *
+     * @param string $sec
+     * @param string $ptype
+     * @param string[][] $rules
+     */
+    public function addPolicies(string $sec, string $ptype, array $rules): void
+    {
+        $cols = [];
+        $i = 0;
+
+        foreach($rules as $rule) {
+            $temp['p_type'] = $ptype;
+            $temp['created_at'] = new DateTime();
+            $temp['updated_at'] = $temp['created_at'];
+            foreach ($rule as $key => $value) {
+                $temp['v'.strval($key)] = $value;
+            }
+            $cols[$i++] = $temp ?? [];
+            $temp = [];
+        }
+        $this->eloquent->insert($cols);
+    }
+
     /**
      * This is part of the Auto-Save feature.
      *
@@ -123,6 +150,33 @@ class DatabaseAdapter implements DatabaseAdapterContract
                 ++$count;
             }
         }
+    }
+
+    /**
+     * Removes policy rules from the storage.
+     * This is part of the Auto-Save feature.
+     *
+     * @param string $sec
+     * @param string $ptype
+     * @param string[][] $rules
+     */
+    public function removePolicies(string $sec, string $ptype, array $rules): void
+    {
+        $count = 0;
+        $instance = $this->eloquent->where('p_type', $ptype);
+        foreach($rules as $rule)
+        {
+            foreach ($rule as $key => $value) {
+                $keys[] = 'v'.strval($key);
+                $con['v'.strval($key)][] = $value;
+            }
+        }
+        $keys = array_unique($keys);
+        foreach($keys as $key){
+            $instance->whereIn($key, $con[$key]);
+        }
+        $num = $instance->delete();
+        $count += $num;
     }
 
     /**

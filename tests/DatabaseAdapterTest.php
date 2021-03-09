@@ -27,6 +27,20 @@ class DatabaseAdapterTest extends TestCase
         $this->assertTrue(Enforcer::enforce('eve', 'data3', 'read'));
     }
 
+    public function testAddPolicies()
+    {
+        $policies = [
+            ['u1', 'd1', 'read'],
+            ['u2', 'd2', 'read'],
+            ['u3', 'd3', 'read'],
+        ];
+        Enforcer::clearPolicy();
+        $this->initTable();
+        $this->assertEquals([], Enforcer::getPolicy());
+        Enforcer::addPolicies($policies);
+        $this->assertEquals($policies, Enforcer::getPolicy());
+    }
+
     public function testSavePolicy()
     {
         $this->assertFalse(Enforcer::enforce('alice', 'data4', 'read'));
@@ -49,6 +63,26 @@ class DatabaseAdapterTest extends TestCase
 
         Enforcer::deletePermissionForUser('alice', 'data5', 'read');
         $this->assertFalse(Enforcer::enforce('alice', 'data5', 'read'));
+    }
+
+    public function testRemovePolicies()
+    {
+        $this->assertEquals([
+            ['alice', 'data1', 'read'],
+            ['bob', 'data2', 'write'],
+            ['data2_admin', 'data2', 'read'],
+            ['data2_admin', 'data2', 'write'],
+        ], Enforcer::getPolicy());
+
+        Enforcer::removePolicies([
+            ['data2_admin', 'data2', 'read'],
+            ['data2_admin', 'data2', 'write'],
+        ]);
+
+        $this->assertEquals([
+            ['alice', 'data1', 'read'],
+            ['bob', 'data2', 'write']
+        ], Enforcer::getPolicy());
     }
 
     public function testRemoveFilteredPolicy()
