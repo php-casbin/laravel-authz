@@ -7,6 +7,7 @@ namespace Lauthz\Adapters;
 use Lauthz\Models\Rule;
 use Lauthz\Contracts\DatabaseAdapter as DatabaseAdapterContract;
 use Lauthz\Contracts\BatchDatabaseAdapter as BatchDatabaseAdapterContract;
+use Lauthz\Contracts\UpdatableDatabaseAdapter as UpdatableDatabaseAdapterContract; 
 use Casbin\Model\Model;
 use Casbin\Persist\AdapterHelper;
 use DateTime;
@@ -15,7 +16,7 @@ use DateTime;
  *
  * @author techlee@qq.com
  */
-class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterContract
+class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterContract, UpdatableDatabaseAdapterContract
 {
     use AdapterHelper;
 
@@ -206,5 +207,29 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
                 ++$count;
             }
         }
+    }
+
+    /**
+     * Updates a policy rule from storage.
+     * This is part of the Auto-Save feature.
+     *
+     * @param string $sec
+     * @param string $ptype
+     * @param string[] $oldRule
+     * @param string[] $newPolicy
+     */
+    public function updatePolicy(string $sec, string $ptype, array $oldRule, array $newPolicy): void
+    {
+        $instance = $this->eloquent->where('p_type', $ptype);
+        foreach($oldRule as $k => $v) {
+            $instance->where($k, $v);
+        }
+        $instance->first();
+        $update = [];
+        foreach($newPolicy as $k => $v) {
+            $item = 'v' . $k;
+            $update[$item] = $k;
+        }
+        $instance->update($update);
     }
 }
