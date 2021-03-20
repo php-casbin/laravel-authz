@@ -222,7 +222,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
     {
         $instance = $this->eloquent->where('p_type', $ptype);
         foreach($oldRule as $k => $v) {
-            $instance->where($k, $v);
+            $instance->where('v' . $k, $v);
         }
         $instance->first();
         $update = [];
