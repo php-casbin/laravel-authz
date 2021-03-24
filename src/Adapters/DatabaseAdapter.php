@@ -7,18 +7,26 @@ namespace Lauthz\Adapters;
 use Lauthz\Models\Rule;
 use Lauthz\Contracts\DatabaseAdapter as DatabaseAdapterContract;
 use Lauthz\Contracts\BatchDatabaseAdapter as BatchDatabaseAdapterContract;
-use Lauthz\Contracts\UpdatableDatabaseAdapter as UpdatableDatabaseAdapterContract; 
+use Lauthz\Contracts\UpdatableDatabaseAdapter as UpdatableDatabaseAdapterContract;
+use Lauthz\Contracts\FilteredDatabaseAdapter as FilteredDatabaseAdapterContract;
+use Casbin\Persist\Adapters\Filter;
 use Casbin\Model\Model;
 use Casbin\Persist\AdapterHelper;
 use DateTime;
+use Casbin\Exceptions\InvalidFilterTypeException;
 /**
  * DatabaseAdapter.
  *
  * @author techlee@qq.com
  */
-class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterContract, UpdatableDatabaseAdapterContract
+class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterContract, UpdatableDatabaseAdapterContract, FilteredDatabaseAdapterContract
 {
     use AdapterHelper;
+
+    /**
+     * @var bool
+     */
+    private $filtered = false;
 
     /**
      * Rules eloquent model.
@@ -231,5 +239,60 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
             $update[$item] = $k;
         }
         $instance->update($update);
+    }
+
+    /**
+     * Loads only policy rules that match the filter.
+     *
+     * @param Model $model
+     * @param mixed $filter
+     */
+    public function loadFilteredPolicy(Model $model, $filter): void
+    {
+        $instance = $this->eloquent;
+
+        if (is_string($filter)) {
+            $filter = str_replace(' ', '', $filter);
+            $filter = explode('=', $filter);
+            $instance = $instance->where($filter[0], $filter[1]);
+        } else if ($filter instanceof Filter) {
+            foreach($filter->p as $k => $v) {
+                $where[$v] = $filter->g[$k];
+                $instance = $instance->where($v, $filter->g[$k]);
+            }
+        } else if ($filter instanceof \Closure) {
+            $filter($instance);
+        } else {
+            throw new InvalidFilterTypeException('invalid filter type');
+        }
+        $rows = $instance->get()->makeHidden(['created_at','updated_at', 'id'])->toArray();
+        foreach ($rows as $row) {
+            $row = array_filter($row, function($value) { return !is_null($value) && $value !== ''; });
+            $line = implode(', ', array_filter($row, function ($val) {
+                return '' != $val && !is_null($val);
+            }));
+            $this->loadPolicyLine(trim($line), $model);
+        }
+        $this->setFiltered(true);
+    }
+
+    /**
+     * Returns true if the loaded policy has been filtered.
+     *
+     * @return bool
+     */
+    public function isFiltered(): bool
+    {
+        return $this->filtered;
+    }
+
+    /**
+     * Sets filtered parameter.
+     *
+     * @param bool $filtered
+     */
+    public function setFiltered(bool $filtered): void
+    {
+        $this->filtered = $filtered;
     }
 }

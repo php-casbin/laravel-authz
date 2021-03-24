@@ -4,7 +4,9 @@ namespace Lauthz\Tests;
 
 use Enforcer;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-
+use Casbin\Persist\Adapters\Filter;
+use Lauthz\Models\Rule;
+use Casbin\Exceptions\InvalidFilterTypeException;
 class DatabaseAdapterTest extends TestCase
 {
     use DatabaseMigrations;
@@ -126,6 +128,50 @@ class DatabaseAdapterTest extends TestCase
             ['bob', 'data2', 'read'],
             ['data2_admin', 'data2', 'read'],
             ['data2_admin', 'data2', 'write'],
+        ], Enforcer::getPolicy());
+    }
+
+    public function testLoadFilteredPolicy()
+    {
+        $this->initTable();
+        Enforcer::clearPolicy();
+        $this->initConfig();
+        $adapter = Enforcer::getAdapter();
+        $adapter->setFiltered(true);
+        $this->assertEquals([], Enforcer::getPolicy());
+
+        // invalid filter type
+        try {
+            $filter = ['alice', 'data1', 'read'];
+            Enforcer::loadFilteredPolicy($filter);
+            $e = InvalidFilterTypeException::class;
+            $this->fail("Expected exception $e not thrown");
+        } catch (InvalidFilterTypeException $e) {
+            $this->assertEquals("invalid filter type", $e->getMessage());
+        }
+
+        // string
+        $filter = "v0 = bob";
+        Enforcer::loadFilteredPolicy($filter);
+        $this->assertEquals([
+            ['bob', 'data2', 'write']
+        ], Enforcer::getPolicy());
+        
+        // Filter
+        $filter = new Filter(['v2'], ['read']);
+        Enforcer::loadFilteredPolicy($filter);
+        $this->assertEquals([
+            ['alice', 'data1', 'read'],
+            ['data2_admin', 'data2', 'read'],
+        ], Enforcer::getPolicy());
+
+        // Closure
+        Enforcer::loadFilteredPolicy(function (Rule &$rule) {
+            $rule = $rule->where('v1', 'data1');
+        });
+
+        $this->assertEquals([
+            ['alice', 'data1', 'read'],
         ], Enforcer::getPolicy());
     }
 }
