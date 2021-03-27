@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-    <strong>Laravel-authz is an authorization library for the laravel framework.</strong>    
+    <strong>Laravel-authz 是一个专为 Laravel 打造的授权（角色和权限控制）工具</strong>    
 </p>
 
 <p align="center">
@@ -23,42 +23,42 @@
         <img src="https://poser.pugx.org/casbin/laravel-authz/license" alt="License">
     </a>
 </p>
-[Chinese Version](https://github.com/php-casbin/laravel-authz/blob/master/README_CN.md)
+[英文版本](https://github.com/php-casbin/laravel-authz/blob/master/README.md)
 
-It's based on [Casbin](https://github.com/php-casbin/php-casbin), an authorization library that supports access control models like ACL, RBAC, ABAC.
+它基于 [PHP-Casbin](https://github.com/php-casbin/php-casbin), 一个强大的、高效的开源访问控制框架，支持基于`ACL`, `RBAC`, `ABAC`等访问控制模型。
 
-All you need to learn to use `Casbin` first.
+在这之前，你需要先了解 [Casbin](https://github.com/php-casbin/php-casbin) 的相关知识。
 
-* [Installation](#installation)
-* [Usage](#usage)
-  * [Quick start](#quick-start)
-  * [Using Enforcer Api](#using-enforcer-api)
-  * [Using a middleware](#using-a-middleware)
-    * [basic Enforcer Middleware](#basic-enforcer-middleware)
-    * [HTTP Request Middleware ( RESTful is also supported )](#http-request-middleware--restful-is-also-supported-)
-  * [Multiple enforcers](#multiple-enforcers)
-  * [Using artisan commands](#using-artisan-commands)
-  * [Cache](#using-cache)
-* [Thinks](#thinks)
+* [安装](#安装)
+* [用法](#用法)
+  * [快速开始](#快速开始)
+  * [使用 Enforcer Api](#使用-enforcer-api)
+  * [使用中间件](#使用中间件)
+    * [基础 Enforcer 中间件](#基础-enforcer-中间件)
+    * [HTTP 请求中间件 ( 同时支持RESTful )](#http-请求中间件--同时支持-restful-)
+  * [多个 Enforcer 设置](#多个-Enforcer-设置)
+  * [使用 artisan 命令](#使用-artisan-命令)
+  * [缓存](#使用缓存)
+* [感谢](#感谢)
 * [License](#license)
 
-## Installation
+## 安装
 
-Require this package in the `composer.json` of your Laravel project. Then execute the following command on the command line. This will download the package.
+在 Laravel 应用根目录下的 `composer.json` 文件中指定该扩展，然后运行下面的 `composer` 命令。该扩展会被下载
 
-```php
+```
 composer install
 ```
 
-Or use the command line tool to enter the root directory of your Laravel application and run the following `composer` command to install the extension directly.
+或者使用命令行工具进入 Laravel 应用的根目录，运行下面的 `composer` 命令来直接安装该扩展
 
-```
+```php
 composer require casbin/laravel-authz
 ```
 
-The `Lauthz\LauthzServiceProvider` is `auto-discovered` and registered by default, but if you want to register it yourself:
+`Lauthz\LauthzServiceProvider` 默认会被自动发现并注册，但你也可以像下面这样手动注册它
 
-Add the ServiceProvider in `config/app.php`
+在 `config/app.php` 文件中添加该服务提供者
 
 ```php
 'providers' => [
@@ -69,9 +69,9 @@ Add the ServiceProvider in `config/app.php`
 ]
 ```
 
-The Enforcer facade is also `auto-discovered`, but if you want to add it manually:
+`Enforcer` 门面也会被自动发现，但你也可以像下面这样手动添加它
 
-Add the Facade in `config/app.php`
+在 `config/app.php` 文件中添加该门面
 
 ```php
 'aliases' => [
@@ -80,32 +80,31 @@ Add the Facade in `config/app.php`
 ]
 ```
 
-To publish the config, run the vendor publish command:
+如果想要发布该扩展的设置文件，运行下面的 `artisan` 命令
 
 ```
 php artisan vendor:publish
 ```
 
-This will create a new model config file named `config/lauthz-rbac-model.conf` and a new lauthz config file named `config/lauthz.php`.
+这会在 Laravel 的 `config/` 目录下生产一个叫做 `lauthz-rbac-model.conf` 的模型设置文件，和一个叫做 `lauthz.php` 的扩展设置文件
 
 
-To migrate the migrations, run the migrate command:
+如果想要创建扩展对应的数据库文件，运行下面的 `artisan` 命令
 
 ```
 php artisan migrate
 ```
 
-This will create a new table named `rules`
+这会创建一个叫做 `rules` 的数据表
 
 
-## Usage
+## 用法
 
-### Quick start
+### 快速开始
 
-Once installed you can do stuff like this:
+安装成功后，可以这样使用:
 
 ```php
-
 use Enforcer;
 
 // adds permissions to a user
@@ -117,7 +116,7 @@ Enforcer::addPolicy('writer', 'articles','edit');
 
 ```
 
-You can check if a user has a permission like this:
+你可以检查一个用户是否拥有某个权限:
 
 ```php
 // to check if a user has permission
@@ -129,47 +128,47 @@ if (Enforcer::enforce("eve", "articles", "edit")) {
 
 ```
 
-### Using Enforcer Api
+### 使用 Enforcer Api
 
-It provides a very rich api to facilitate various operations on the Policy:
+它提供了非常丰富的 `API`，以促进对 `Policy` 的各种操作：
 
-Gets all roles:
+获取所有角色:
 
 ```php
 Enforcer::getAllRoles(); // ['writer', 'reader']
 ```
 
-Gets all the authorization rules in the policy.:
+获取所有的角色的授权规则：
 
 ```php
 Enforcer::getPolicy();
 ```
 
-Gets the roles that a user has.
+获取某个用户的所有角色：
 
 ```php
 Enforcer::getRolesForUser('eve'); // ['writer']
 ```
 
-Gets the users that has a role.
+获取担任某个角色的所有用户：
 
 ```php
 Enforcer::getUsersForRole('writer'); // ['eve']
 ```
 
-Determines whether a user has a role.
+决定用户是否拥有某个角色：
 
 ```php
 Enforcer::hasRoleForUser('eve', 'writer'); // true or false
 ```
 
-Adds a role for a user.
+给用户添加角色：
 
 ```php
 Enforcer::addRoleForUser('eve', 'writer');
 ```
 
-Adds a permission for a user or role.
+赋予权限给某个用户或角色：
 
 ```php
 // to user
@@ -178,37 +177,37 @@ Enforcer::addPermissionForUser('eve', 'articles', 'read');
 Enforcer::addPermissionForUser('writer', 'articles','edit');
 ```
 
-Deletes a role for a user.
+删除用户的角色：
 
 ```php
 Enforcer::deleteRoleForUser('eve', 'writer');
 ```
 
-Deletes all roles for a user.
+删除某个用户的所有角色：
 
 ```php
 Enforcer::deleteRolesForUser('eve');
 ```
 
-Deletes a role.
+删除单个角色：
 
 ```php
 Enforcer::deleteRole('writer');
 ```
 
-Deletes a permission.
+删除某个权限：
 
 ```php
 Enforcer::deletePermission('articles', 'read'); // returns false if the permission does not exist (aka not affected).
 ```
 
-Deletes a permission for a user or role.
+删除某个用户或角色的权限：
 
 ```php
 Enforcer::deletePermissionForUser('eve', 'articles', 'read');
 ```
 
-Deletes permissions for a user or role.
+删除某个用户或角色的所有权限：
 
 ```php
 // to user
@@ -217,23 +216,23 @@ Enforcer::deletePermissionsForUser('eve');
 Enforcer::deletePermissionsForUser('writer');
 ```
 
-Gets permissions for a user or role.
+获取用户或角色的所有权限：
 
 ```php
 Enforcer::getPermissionsForUser('eve'); // return array
 ```
 
-Determines whether a user has a permission.
+决定某个用户是否拥有某个权限：
 
 ```php
 Enforcer::hasPermissionForUser('eve', 'articles', 'read');  // true or false
 ```
 
-See [Casbin API](https://casbin.org/docs/en/management-api) for more APIs.
+更多 `API` 参考 [Casbin API](https://casbin.org/docs/en/management-api) 。
 
-### Using a middleware
+### 使用中间件
 
-This package comes with `EnforcerMiddleware`, `RequestMiddleware` middlewares. You can add them inside your `app/Http/Kernel.php` file.
+这个扩展包括 `EnforcerMiddleware`，`RequestMiddleware` 这两个中间件，你可以在你 Laravel 应用的 `app/Http/Kernel.php` 文件中添加上它们
 
 ```php
 protected $routeMiddleware = [
@@ -245,9 +244,9 @@ protected $routeMiddleware = [
 ];
 ```
 
-#### basic Enforcer Middleware
+#### 基础 Enforcer 中间件
 
-Then you can protect your routes using middleware rules:
+然后，你可以通过使用该中间件来保护对应的路由
 
 ```php
 Route::group(['middleware' => ['enforcer:articles,read']], function () {
@@ -255,9 +254,9 @@ Route::group(['middleware' => ['enforcer:articles,read']], function () {
 });
 ```
 
-#### HTTP Request Middleware ( RESTful is also supported )
+#### HTTP 请求中间件 ( 同时支持 RESTful )
 
-If you need to authorize a Request，you need to define the model configuration first in `config/lauthz-rbac-model.conf`:
+如果你想要认证一个请求，你需要首先在 `config/lauthz-rbac-model.conf` 文件中定义相应的模型设置
 
 ```ini
 [request_definition]
@@ -276,7 +275,7 @@ e = some(where (p.eft == allow))
 m = g(r.sub, p.sub) && keyMatch2(r.obj, p.obj) && regexMatch(r.act, p.act)
 ```
 
-Then, using middleware rules:
+然后，向该请求对应的路由添加中间件规则
 
 ```php
 Route::group(['middleware' => ['http_request']], function () {
@@ -284,11 +283,11 @@ Route::group(['middleware' => ['http_request']], function () {
 });
 ```
 
-### Multiple enforcers
+### 多个 Enforcer 设置
 
-If you need multiple permission controls in your project, you can configure multiple enforcers.
+如果在你的项目中你需要多种不同的权限控制，你可以添加多个 `Enforcer` 设置来实现
 
-In the lauthz file, it should be like this:
+在该扩展的 `config/lauthz.php` 设置文件中，内容应该类似下面这样
 
 ```php
 return [
@@ -315,40 +314,40 @@ return [
 
 ```
 
-Then you can choose which enforcers to use.
+然后，你可以像下面这样来选择使用哪一个 `Enforcer` 设置
 
 ```php
 Enforcer::guard('second')->enforce("eve", "articles", "edit");
 ```
 
 
-### Using artisan commands
+### 使用 artisan 命令
 
-You can create a policy from a console with artisan commands.
+你可以在命令行中通过 artisan 命令来创建一个授权策略
 
-To user:
+为用户添加权限
 
 ```bash
 php artisan policy:add eve,articles,read
 ```
 
-To Role:
+为角色添加权限
 
 ```bash
 php artisan policy:add writer,articles,edit
 ```
 
-Adds a role for a user:
+为指定用户添加角色
 
 ```bash
 php artisan role:assign eve writer
 ```
 
-### Using cache
+### 使用缓存
 
-Authorization rules are cached to speed up performance. The default is off.
+可以通过缓存授权规则来提升应用的执行速度，这一功能默认是关闭的
 
-Sets your own cache configs in Laravel's `config/lauthz.php`. 
+在 Laravel 应用的 `config/lauthz.php` 文件中添加你自己的缓存设置
 
 ```php
 'cache' => [
@@ -366,9 +365,9 @@ Sets your own cache configs in Laravel's `config/lauthz.php`.
 ],
 ```
 
-## Thinks
+## 感谢
 
-[Casbin](https://github.com/php-casbin/php-casbin) in Laravel. You can find the full documentation of Casbin [on the website](https://casbin.org/).
+[Casbin](https://github.com/php-casbin/php-casbin)，你可以在其 [官网](https://casbin.org/) 上查看全部文档。
 
 ## License
 
