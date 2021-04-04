@@ -235,8 +235,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
         $instance->first();
         $update = [];
         foreach($newPolicy as $k => $v) {
-            $item = 'v' . $k;
-            $update[$item] = $k;
+            $update['v' . $k] = $v;
         }
         $instance->update($update);
     }
