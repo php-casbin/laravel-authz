@@ -81,7 +81,6 @@ class Rule extends Model
         }
 
         $this->forgetCache();
-        $this->getAllFromCache();
     }
 
     /**
