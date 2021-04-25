@@ -154,7 +154,11 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
             $instance->where('v'.strval($key), $value);
         }
 
-        $instance->delete();
+        foreach ($instance->get() as $model) {
+            if ($model->delete()) {
+                ++$count;
+            }
+        }
     }
 
     /**
@@ -206,7 +210,11 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
             }
         }
 
-        $instance->delete();
+        foreach ($instance->get() as $model) {
+            if ($model->delete()) {
+                ++$count;
+            }
+        }
     }
 
     /**
