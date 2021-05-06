@@ -135,6 +135,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
             $temp = [];
         }
         $this->eloquent->insert($cols);
+        Rule::fireModelEvent('saved');
     }
 
     /**
@@ -146,19 +147,14 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function removePolicy(string $sec, string $ptype, array $rule): void
     {
-        $count = 0;
-
         $instance = $this->eloquent->where('p_type', $ptype);
 
         foreach ($rule as $key => $value) {
             $instance->where('v'.strval($key), $value);
         }
 
-        foreach ($instance->get() as $model) {
-            if ($model->delete()) {
-                ++$count;
-            }
-        }
+        $instance->delete();
+        Rule::fireModelEvent('deleted');
     }
 
     /**
@@ -171,7 +167,6 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function removePolicies(string $sec, string $ptype, array $rules): void
     {
-        $count = 0;
         $instance = $this->eloquent->where('p_type', $ptype);
         foreach($rules as $rule)
         {
@@ -184,8 +179,8 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
         foreach($keys as $key){
             $instance->whereIn($key, $con[$key]);
         }
-        $num = $instance->delete();
-        $count += $num;
+        $instance->delete();
+        Rule::fireModelEvent('deleted');
     }
 
     /**
@@ -199,9 +194,8 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function removeFilteredPolicy(string $sec, string $ptype, int $fieldIndex, string ...$fieldValues): void
     {
-        $count = 0;
-
         $instance = $this->eloquent->where('p_type', $ptype);
+        
         foreach (range(0, 5) as $value) {
             if ($fieldIndex <= $value && $value < $fieldIndex + count($fieldValues)) {
                 if ('' != $fieldValues[$value - $fieldIndex]) {
@@ -209,12 +203,9 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
                 }
             }
         }
-
-        foreach ($instance->get() as $model) {
-            if ($model->delete()) {
-                ++$count;
-            }
-        }
+        
+        $instance->delete();
+        Rule::fireModelEvent('deleted');
     }
 
     /**
@@ -238,6 +229,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
             $update['v' . $k] = $v;
         }
         $instance->update($update);
+        Rule::fireModelEvent('saved');
     }
 
     /**
