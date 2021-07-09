@@ -14,6 +14,7 @@ use Casbin\Model\Model;
 use Casbin\Persist\AdapterHelper;
 use DateTime;
 use Casbin\Exceptions\InvalidFilterTypeException;
+use Illuminate\Support\Facades\DB;
 /**
  * DatabaseAdapter.
  *
@@ -167,20 +168,11 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function removePolicies(string $sec, string $ptype, array $rules): void
     {
-        $instance = $this->eloquent->where('p_type', $ptype);
-        foreach($rules as $rule)
-        {
-            foreach ($rule as $key => $value) {
-                $keys[] = 'v'.strval($key);
-                $con['v'.strval($key)][] = $value;
+        DB::transaction(function () use ($sec, $rules, $ptype) {
+            foreach ($rules as $rule) {
+                $this->removePolicy($sec, $ptype, $rule);
             }
-        }
-        $keys = array_unique($keys);
-        foreach($keys as $key){
-            $instance->whereIn($key, $con[$key]);
-        }
-        $instance->delete();
-        Rule::fireModelEvent('deleted');
+        });
     }
 
     /**
