@@ -131,6 +131,34 @@ class DatabaseAdapterTest extends TestCase
         ], Enforcer::getPolicy());
     }
 
+    public function testUpdatePolicies()
+    {
+        $this->assertEquals([
+            ['alice', 'data1', 'read'],
+            ['bob', 'data2', 'write'],
+            ['data2_admin', 'data2', 'read'],
+            ['data2_admin', 'data2', 'write'],
+        ], Enforcer::getPolicy());
+
+        $oldPolicies = [
+            ['alice', 'data1', 'read'],
+            ['bob', 'data2', 'write']
+        ];
+        $newPolicies = [
+            ['alice', 'data1', 'write'],
+            ['bob', 'data2', 'read']
+        ];
+
+        Enforcer::updatePolicies($oldPolicies, $newPolicies);
+
+        $this->assertEquals([
+            ['alice', 'data1', 'write'],
+            ['bob', 'data2', 'read'],
+            ['data2_admin', 'data2', 'read'],
+            ['data2_admin', 'data2', 'write'],
+        ], Enforcer::getPolicy());
+    }
+
     public function testLoadFilteredPolicy()
     {
         $this->initTable();

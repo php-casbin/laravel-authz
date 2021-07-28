@@ -225,6 +225,24 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
     }
 
     /**
+     * UpdatePolicies updates some policy rules to storage, like db, redis.
+     *
+     * @param string $sec
+     * @param string $ptype
+     * @param string[][] $oldRules
+     * @param string[][] $newRules
+     * @return void
+     */
+    public function updatePolicies(string $sec, string $ptype, array $oldRules, array $newRules): void
+    {
+        DB::transaction(function () use ($sec, $ptype, $oldRules, $newRules) {
+            foreach ($oldRules as $i => $oldRule) {
+                $this->updatePolicy($sec, $ptype, $oldRule, $newRules[$i]);
+            }
+        });
+    }
+
+    /**
      * Loads only policy rules that match the filter.
      *
      * @param Model $model
