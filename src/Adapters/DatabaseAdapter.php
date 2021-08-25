@@ -15,6 +15,7 @@ use Casbin\Persist\AdapterHelper;
 use DateTime;
 use Casbin\Exceptions\InvalidFilterTypeException;
 use Illuminate\Support\Facades\DB;
+
 /**
  * DatabaseAdapter.
  *
@@ -240,6 +241,54 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
                 $this->updatePolicy($sec, $ptype, $oldRule, $newRules[$i]);
             }
         });
+    }
+
+    /**
+     * UpdateFilteredPolicies deletes old rules and adds new rules.
+     *
+     * @param string $sec
+     * @param string $ptype
+     * @param array $newPolicies
+     * @param integer $fieldIndex
+     * @param string ...$fieldValues
+     * @return array
+     */
+    public function updateFilteredPolicies(string $sec, string $ptype, array $newPolicies, int $fieldIndex, string ...$fieldValues): array
+    {
+        $where['p_type'] = $ptype;
+        foreach ($fieldValues as $fieldValue) {
+            if (!is_null($fieldValue) && $fieldValue !== '') {
+                $where['v'. $fieldIndex++] = $fieldValue;
+            }
+        }
+
+        $newP = [];
+        $oldP = [];
+        foreach ($newPolicies as $newRule) {
+            $col['p_type'] = $ptype;
+            foreach ($newRule as $key => $value) {
+                $col['v' . strval($key)] = $value;
+            }
+            $newP[] = $col;
+        }
+
+        DB::transaction(function () use ($newP, $where, &$oldP) {
+            $oldRules = $this->eloquent->where($where);
+            $oldP = $oldRules->get()->makeHidden(['created_at','updated_at', 'id'])->toArray();
+
+            foreach ($oldP as &$item) {
+                $item = array_filter($item, function ($value) {
+                    return !is_null($value) && $value !== '';
+                });
+                unset($item['p_type']);
+            }
+            
+            $oldRules->delete();
+            $this->eloquent->create($newP);
+        });
+
+        // return deleted rules
+        return $oldP;
     }
 
     /**
