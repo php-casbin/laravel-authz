@@ -277,9 +277,7 @@ class DatabaseAdapterTest extends TestCase
         Enforcer::updateFilteredPolicies([['alice', 'data2', 'read'], ["bob", "data2", "read"]], 2, 'write');
 
         $policies = [
-            ['alice', 'data1', 'write'],
             ['alice', 'data2', 'read'],
-            ['bob', 'data1', 'write'],
             ['bob', 'data2', 'read'],
         ];
 

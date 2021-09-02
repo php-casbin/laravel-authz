@@ -266,6 +266,8 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
         $oldP = [];
         foreach ($newPolicies as $newRule) {
             $col['p_type'] = $ptype;
+            $col['created_at'] = new DateTime();
+            $col['updated_at'] = $col['created_at'];
             foreach ($newRule as $key => $value) {
                 $col['v' . strval($key)] = $value;
             }
@@ -284,8 +286,10 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
             }
             
             $oldRules->delete();
-            $this->eloquent->create($newP);
+            $this->eloquent->insert($newP);
         });
+
+        Rule::fireModelEvent('saved');
 
         // return deleted rules
         return $oldP;
