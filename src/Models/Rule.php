@@ -29,7 +29,7 @@ class Rule extends Model
      *
      * @var array
      */
-    protected $fillable = ['p_type', 'v0', 'v1', 'v2', 'v3', 'v4', 'v5'];
+    protected $fillable = ['ptype', 'v0', 'v1', 'v2', 'v3', 'v4', 'v5'];
 
     /**
      * Create a new Eloquent model instance.
@@ -62,7 +62,7 @@ class Rule extends Model
     public function getAllFromCache()
     {
         $get = function () {
-            return $this->select('p_type', 'v0', 'v1', 'v2', 'v3', 'v4', 'v5')->get()->toArray();
+            return $this->select('ptype', 'v0', 'v1', 'v2', 'v3', 'v4', 'v5')->get()->toArray();
         };
         if (!$this->config('cache.enabled', false)) {
             return $get();

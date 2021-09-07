@@ -55,7 +55,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function savePolicyLine(string $ptype, array $rule): void
     {
-        $col['p_type'] = $ptype;
+        $col['ptype'] = $ptype;
         foreach ($rule as $key => $value) {
             $col['v'.strval($key)] = $value;
         }
@@ -127,7 +127,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
         $i = 0;
 
         foreach($rules as $rule) {
-            $temp['p_type'] = $ptype;
+            $temp['ptype'] = $ptype;
             $temp['created_at'] = new DateTime();
             $temp['updated_at'] = $temp['created_at'];
             foreach ($rule as $key => $value) {
@@ -149,7 +149,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function removePolicy(string $sec, string $ptype, array $rule): void
     {
-        $instance = $this->eloquent->where('p_type', $ptype);
+        $instance = $this->eloquent->where('ptype', $ptype);
 
         foreach ($rule as $key => $value) {
             $instance->where('v'.strval($key), $value);
@@ -187,7 +187,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function removeFilteredPolicy(string $sec, string $ptype, int $fieldIndex, string ...$fieldValues): void
     {
-        $instance = $this->eloquent->where('p_type', $ptype);
+        $instance = $this->eloquent->where('ptype', $ptype);
         
         foreach (range(0, 5) as $value) {
             if ($fieldIndex <= $value && $value < $fieldIndex + count($fieldValues)) {
@@ -212,7 +212,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function updatePolicy(string $sec, string $ptype, array $oldRule, array $newPolicy): void
     {
-        $instance = $this->eloquent->where('p_type', $ptype);
+        $instance = $this->eloquent->where('ptype', $ptype);
         foreach($oldRule as $k => $v) {
             $instance->where('v' . $k, $v);
         }
@@ -255,7 +255,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function updateFilteredPolicies(string $sec, string $ptype, array $newPolicies, int $fieldIndex, string ...$fieldValues): array
     {
-        $where['p_type'] = $ptype;
+        $where['ptype'] = $ptype;
         foreach ($fieldValues as $fieldValue) {
             if (!is_null($fieldValue) && $fieldValue !== '') {
                 $where['v'. $fieldIndex++] = $fieldValue;
@@ -265,7 +265,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
         $newP = [];
         $oldP = [];
         foreach ($newPolicies as $newRule) {
-            $col['p_type'] = $ptype;
+            $col['ptype'] = $ptype;
             $col['created_at'] = new DateTime();
             $col['updated_at'] = $col['created_at'];
             foreach ($newRule as $key => $value) {
@@ -282,7 +282,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
                 $item = array_filter($item, function ($value) {
                     return !is_null($value) && $value !== '';
                 });
-                unset($item['p_type']);
+                unset($item['ptype']);
             }
             
             $oldRules->delete();
