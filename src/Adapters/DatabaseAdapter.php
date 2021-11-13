@@ -48,6 +48,26 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
     }
 
     /**
+     * Filter the rule.
+     *
+     * @param array $rule
+     * @return array
+     */
+    public function filterRule(array $rule): array
+    {
+        $rule = array_values($rule);
+
+        $i = count($rule) - 1;
+        for (; $i >= 0; $i--) {
+            if ($rule[$i] != '' && !is_null($rule[$i])) {
+                break;
+            }
+        }
+
+        return array_slice($rule, 0, $i + 1);
+    }
+
+    /**
      * savePolicyLine function.
      *
      * @param string $ptype
@@ -177,28 +197,51 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
     }
 
     /**
-     * RemoveFilteredPolicy removes policy rules that match the filter from the storage.
-     * This is part of the Auto-Save feature.
-     *
-     * @param string $sec
-     * @param string $ptype
-     * @param int    $fieldIndex
-     * @param string ...$fieldValues
+     * @param string      $sec
+     * @param string      $ptype
+     * @param int         $fieldIndex
+     * @param string|null ...$fieldValues
+     * @return array
+     * @throws Throwable
      */
-    public function removeFilteredPolicy(string $sec, string $ptype, int $fieldIndex, string ...$fieldValues): void
+    public function _removeFilteredPolicy(string $sec, string $ptype, int $fieldIndex, ?string ...$fieldValues): array
     {
+        $removedRules = [];
         $instance = $this->eloquent->where('ptype', $ptype);
         
         foreach (range(0, 5) as $value) {
             if ($fieldIndex <= $value && $value < $fieldIndex + count($fieldValues)) {
                 if ('' != $fieldValues[$value - $fieldIndex]) {
-                    $instance->where('v'.strval($value), $fieldValues[$value - $fieldIndex]);
+                    $instance->where('v' . strval($value), $fieldValues[$value - $fieldIndex]);
                 }
             }
         }
-        
+
+        $oldP = $instance->get()->makeHidden(['created_at','updated_at', 'id', 'ptype'])->toArray();
+        foreach ($oldP as &$item) {
+            $item = $this->filterRule($item);
+            $removedRules[] = $item;
+        }
+
         $instance->delete();
         Rule::fireModelEvent('deleted');
+
+        return $removedRules;
+    }
+
+    /**
+     * RemoveFilteredPolicy removes policy rules that match the filter from the storage.
+     * This is part of the Auto-Save feature.
+     *
+     * @param string      $sec
+     * @param string      $ptype
+     * @param int         $fieldIndex
+     * @param string|null ...$fieldValues
+     * @return void
+     */
+    public function removeFilteredPolicy(string $sec, string $ptype, int $fieldIndex, ?string ...$fieldValues): void
+    {
+        $this->_removeFilteredPolicy($sec, $ptype, $fieldIndex, ...$fieldValues);
     }
 
     /**
@@ -255,44 +298,12 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function updateFilteredPolicies(string $sec, string $ptype, array $newPolicies, int $fieldIndex, string ...$fieldValues): array
     {
-        $where['ptype'] = $ptype;
-        foreach ($fieldValues as $fieldValue) {
-            if (!is_null($fieldValue) && $fieldValue !== '') {
-                $where['v'. $fieldIndex++] = $fieldValue;
-            }
-        }
-
-        $newP = [];
-        $oldP = [];
-        foreach ($newPolicies as $newRule) {
-            $col['ptype'] = $ptype;
-            $col['created_at'] = new DateTime();
-            $col['updated_at'] = $col['created_at'];
-            foreach ($newRule as $key => $value) {
-                $col['v' . strval($key)] = $value;
-            }
-            $newP[] = $col;
-        }
-
-        DB::transaction(function () use ($newP, $where, &$oldP) {
-            $oldRules = $this->eloquent->where($where);
-            $oldP = $oldRules->get()->makeHidden(['created_at','updated_at', 'id'])->toArray();
-
-            foreach ($oldP as &$item) {
-                $item = array_filter($item, function ($value) {
-                    return !is_null($value) && $value !== '';
-                });
-                unset($item['ptype']);
-            }
-            
-            $oldRules->delete();
-            $this->eloquent->insert($newP);
+        $oldRules = [];
+        DB::transaction(function () use ($sec, $ptype, $fieldIndex, $fieldValues, $newPolicies, &$oldRules) {
+            $oldRules = $this->_removeFilteredPolicy($sec, $ptype, $fieldIndex, ...$fieldValues);
+            $this->addPolicies($sec, $ptype, $newPolicies);
         });
-
-        Rule::fireModelEvent('saved');
-
-        // return deleted rules
-        return $oldP;
+        return $oldRules;
     }
 
     /**
