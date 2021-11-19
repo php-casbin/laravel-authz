@@ -48,6 +48,7 @@ class RequestMiddleware
         if (method_exists($user, 'getAuthzIdentifier')) {
             $identifier = $user->getAuthzIdentifier();
         }
+        $identifier = strval($identifier);
 
         if (empty($guards)) {
             if (Enforcer::enforce($identifier, $request->getPathInfo(), $request->method())) {

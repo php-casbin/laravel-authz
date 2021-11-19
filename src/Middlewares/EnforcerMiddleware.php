@@ -33,6 +33,7 @@ class EnforcerMiddleware
         if (method_exists($user, 'getAuthzIdentifier')) {
             $identifier = $user->getAuthzIdentifier();
         }
+        $identifier = strval($identifier);
 
         if (!Enforcer::enforce($identifier, ...$args)) {
             throw new UnauthorizedException();
