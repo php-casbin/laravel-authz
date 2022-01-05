@@ -93,10 +93,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
         $rows = $this->eloquent->getAllFromCache();
 
         foreach ($rows as $row) {
-            $line = implode(', ', array_filter($row, function ($val) {
-                return '' != $val && !is_null($val);
-            }));
-            $this->loadPolicyLine(trim($line), $model);
+            $this->loadPolicyArray($this->filterRule($row), $model);
         }
     }
 
