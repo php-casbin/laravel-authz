@@ -14,7 +14,7 @@ return [
             // Available Settings: "file", "text"
             'config_type' => 'file',
 
-            'config_file_path' => config_path('lauthz-rbac-model.conf'),
+            'config_file_path' => __DIR__ . DIRECTORY_SEPARATOR . 'lauthz-rbac-model.conf',
 
             'config_text' => '',
         ],
