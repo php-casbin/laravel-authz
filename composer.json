@@ -52,5 +52,10 @@
                 "Enforcer": "Lauthz\\Facades\\Enforcer"
             }
         }
+    },
+    "config": {
+        "allow-plugins": {
+            "kylekatarnls/update-helper": true
+        }
     }
 }
