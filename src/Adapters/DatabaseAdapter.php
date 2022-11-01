@@ -186,7 +186,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function removePolicies(string $sec, string $ptype, array $rules): void
     {
-        DB::transaction(function () use ($sec, $rules, $ptype) {
+        $this->eloquent->getConnection()->transaction(function () use ($sec, $rules, $ptype) {
             foreach ($rules as $rule) {
                 $this->removePolicy($sec, $ptype, $rule);
             }
@@ -276,7 +276,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function updatePolicies(string $sec, string $ptype, array $oldRules, array $newRules): void
     {
-        DB::transaction(function () use ($sec, $ptype, $oldRules, $newRules) {
+        $this->eloquent->getConnection()->transaction(function () use ($sec, $ptype, $oldRules, $newRules) {
             foreach ($oldRules as $i => $oldRule) {
                 $this->updatePolicy($sec, $ptype, $oldRule, $newRules[$i]);
             }
@@ -296,7 +296,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
     public function updateFilteredPolicies(string $sec, string $ptype, array $newPolicies, int $fieldIndex, string ...$fieldValues): array
     {
         $oldRules = [];
-        DB::transaction(function () use ($sec, $ptype, $fieldIndex, $fieldValues, $newPolicies, &$oldRules) {
+        $this->eloquent->getConnection()->transaction(function () use ($sec, $ptype, $fieldIndex, $fieldValues, $newPolicies, &$oldRules) {
             $oldRules = $this->_removeFilteredPolicy($sec, $ptype, $fieldIndex, ...$fieldValues);
             $this->addPolicies($sec, $ptype, $newPolicies);
         });
