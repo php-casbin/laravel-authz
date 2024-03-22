@@ -46,6 +46,7 @@ abstract class TestCase extends BaseTestCase
         $this->app['config']->set('database.default', 'mysql');
         $this->app['config']->set('database.connections.mysql.charset', 'utf8');
         $this->app['config']->set('database.connections.mysql.collation', 'utf8_unicode_ci');
+        $this->app['config']->set('cache.default', 'array');
         // $app['config']->set('lauthz.log.enabled', true);
     }
 

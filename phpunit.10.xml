@@ -11,16 +11,22 @@
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./src</directory>
-        </whitelist>
-    </filter>
 
-    <logging>
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
-        <log type="coverage-html" target="build/html"/>
-    </logging>
+    <coverage includeUncoveredFiles="true"
+          pathCoverage="false"
+          ignoreDeprecatedCodeUnits="true"
+          disableCodeCoverageIgnore="true">
+        <report>
+            <clover outputFile="build/logs/clover.xml"/>
+            <html outputDirectory="build/html" lowUpperBound="50" highLowerBound="90"/>
+        </report>
+    </coverage>
+
+    <source>
+        <include>
+            <directory>./src</directory>
+        </include>
+    </source>
 
     <php>
         <env name="APP_ENV" value="testing"/>
