@@ -105,7 +105,14 @@ jobs:
           - php: 8.1
             laravel: 10.*
             phpunit: ~9.0
-
+          # Laravel 11.x
+          - php: 8.2
+            laravel: 11.*
+            phpunit: ~10.5
+          - php: 8.3
+            laravel: 11.*
+            phpunit: ~10.5
+            
     name: Laravel${{ matrix.laravel }}-PHP${{ matrix.php }}
 
     steps:
@@ -130,7 +137,12 @@ jobs:
           composer install --prefer-dist --no-progress --no-suggest
 
       - name: Run test suite
+        if: matrix.laravel != '11.*'
         run: ./vendor/bin/phpunit -v
+
+      - name: Run test suite laravel 11
+        if: matrix.laravel == '11.*'
+        run: ./vendor/bin/phpunit -c phpunit.10.xml
 
       - name: Run Coveralls
         env:
