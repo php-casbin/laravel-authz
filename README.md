@@ -105,7 +105,7 @@ use Enforcer;
 Enforcer::addPermissionForUser('eve', 'articles', 'read');
 // adds a role for a user.
 Enforcer::addRoleForUser('eve', 'writer');
-// adds permissions to a rule
+// adds permissions to a role
 Enforcer::addPolicy('writer', 'articles','edit');
 
 ```
