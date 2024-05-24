@@ -17,7 +17,8 @@ class RoleAssign extends Command
      */
     protected $signature = 'role:assign
                             {user : the identifier of user}
-                            {role : the name of role}';
+                            {role : the name of role}
+                            {--ptype= : the ptype of role}';
 
     /**
      * The console command description.
@@ -35,8 +36,9 @@ class RoleAssign extends Command
     {
         $user = $this->argument('user');
         $role = $this->argument('role');
+        $ptype = $this->option('ptype') ?: 'g';
 
-        $ret = Enforcer::addRoleForUser($user, $role);
+        $ret = Enforcer::addNamedGroupingPolicy($ptype, $user, $role);
         if ($ret) {
             $this->info('Added `'.$role.'` role to `'.$user.'` successfully');
         } else {

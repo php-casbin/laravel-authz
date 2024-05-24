@@ -335,6 +335,8 @@ Adds a role for a user:
 
 ```bash
 php artisan role:assign eve writer
+# Specify the ptype of the role assignment by using the --ptype option.
+php artisan role:assign eve writer --ptype=g2
 ```
 
 ### Using cache
