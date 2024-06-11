@@ -11,12 +11,14 @@ return [
         * Casbin model setting.
         */
         'model' => [
-            // Available Settings: "file", "text"
+            // Available Settings: "file", "text", "url"
             'config_type' => 'file',
 
             'config_file_path' => __DIR__ . DIRECTORY_SEPARATOR . 'lauthz-rbac-model.conf',
 
             'config_text' => '',
+
+            'config_url' => ''
         ],
 
         /*

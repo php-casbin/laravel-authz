@@ -7,6 +7,7 @@ use Casbin\Enforcer;
 use Casbin\Model\Model;
 use Casbin\Log\Log;
 use Lauthz\Contracts\Factory;
+use Lauthz\Contracts\ModelLoader;
 use Lauthz\Models\Rule;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
@@ -86,12 +87,9 @@ class EnforcerManager implements Factory
         }
 
         $model = new Model();
-        $configType = Arr::get($config, 'model.config_type');
-        if ('file' == $configType) {
-            $model->loadModel(Arr::get($config, 'model.config_file_path', ''));
-        } elseif ('text' == $configType) {
-            $model->loadModelFromText(Arr::get($config, 'model.config_text', ''));
-        }
+        $loader = $this->app->make(ModelLoader::class, $config);
+        $loader->loadModel($model);
+
         $adapter = Arr::get($config, 'adapter');
         if (!is_null($adapter)) {
             $adapter = $this->app->make($adapter, [
