@@ -3,6 +3,8 @@
 namespace Lauthz;
 
 use Illuminate\Support\ServiceProvider;
+use Lauthz\Contracts\ModelLoader;
+use Lauthz\Loaders\ModelLoaderFactory;
 use Lauthz\Models\Rule;
 use Lauthz\Observers\RuleObserver;
 
@@ -49,6 +51,10 @@ class LauthzServiceProvider extends ServiceProvider
     {
         $this->app->singleton('enforcer', function ($app) {
             return new EnforcerManager($app);
+        });
+
+        $this->app->bind(ModelLoader::class, function($app, $config) {
+            return ModelLoaderFactory::createFromConfig($config);
         });
     }
 }
