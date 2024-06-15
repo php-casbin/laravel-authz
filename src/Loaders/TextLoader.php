@@ -34,7 +34,6 @@ class TextLoader implements ModelLoader
      */
     public function loadModel(Model $model): void
     {
-//        dd($this->text);
         $model->loadModelFromText($this->text);
     }
 }
