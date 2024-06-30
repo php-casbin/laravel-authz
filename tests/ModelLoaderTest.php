@@ -3,6 +3,7 @@
 namespace Lauthz\Tests;
 
 use Lauthz\Facades\Enforcer;
+use Lauthz\Loaders\ModelLoaderManager;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -67,7 +68,15 @@ class ModelLoaderTest extends TestCase
         $this->assertFalse(Enforcer::enforce('alice', 'data', 'read'));
     }
 
-    public function testBadUlrConnection(): void
+    public function testNotExistLoaderType(): void
+    {
+        $this->app['config']->set('lauthz.basic.model.config_type', 'not_exist');
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->assertFalse(Enforcer::enforce('alice', 'data', 'read'));
+    }
+
+    public function testBadUrlConnection(): void
     {
         $this->initUrlConfig();
         $this->app['config']->set('lauthz.basic.model.config_url', 'http://filenoexists');
@@ -94,12 +103,20 @@ class ModelLoaderTest extends TestCase
         );
     }
 
-    protected function initCustomConfig(): void {
-        $this->app['config']->set('lauthz.second.model.config_loader_class', '\Lauthz\Loaders\TextLoader');
+    protected function initCustomConfig(): void
+    {
+        $this->app['config']->set('lauthz.second.model.config_type', 'custom');
         $this->app['config']->set(
             'lauthz.second.model.config_text',
             $this->getModelText()
         );
+
+        $config = $this->app['config']->get('lauthz.second');
+        $loader = $this->app->make(ModelLoaderManager::class);
+
+        $loader->extend('custom', function () use ($config) {
+            return new \Lauthz\Loaders\TextLoader($config);
+        });
     }
 
     protected function getModelText(): string

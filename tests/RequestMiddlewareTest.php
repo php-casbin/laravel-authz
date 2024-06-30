@@ -5,6 +5,7 @@ namespace Lauthz\Tests;
 use Lauthz\Middlewares\RequestMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Request;
+use Lauthz\Facades\Enforcer;
 use Lauthz\Models\Rule;
 
 class RequestMiddlewareTest extends TestCase
@@ -34,11 +35,19 @@ class RequestMiddlewareTest extends TestCase
         $this->assertEquals($this->middleware(Request::create('/foo1/123', 'PUT')), 'Unauthorized Exception');
 
         $this->assertEquals($this->middleware(Request::create('/proxy', 'GET')), 'Unauthorized Exception');
+        
+        Enforcer::guard('second')->addPolicy('alice', '/foo1/*', '(GET|POST)');
+
+        $this->assertEquals($this->middleware(Request::create('/foo1/123', 'GET'), 'second'), 200);
+        $this->assertEquals($this->middleware(Request::create('/foo1/123', 'POST'), 'second'), 200);
+        $this->assertEquals($this->middleware(Request::create('/foo1/123', 'PUT'), 'second'), 'Unauthorized Exception');
+
+        $this->assertEquals($this->middleware(Request::create('/proxy', 'GET'), 'second'), 'Unauthorized Exception');
     }
 
-    protected function middleware($request)
+    protected function middleware($request, ...$guards)
     {
-        return parent::runMiddleware(RequestMiddleware::class, $request);
+        return parent::runMiddleware(RequestMiddleware::class, $request, ...$guards);
     }
 
     protected function initConfig()
@@ -62,6 +71,8 @@ e = some(where (p.eft == allow))
 m = g(r.sub, p.sub) && r.sub == p.sub && keyMatch2(r.obj, p.obj) && regexMatch(r.act, p.act)
 EOT;
         $this->app['config']->set('lauthz.basic.model.config_text', $text);
+        $this->app['config']->set('lauthz.second.model.config_type', 'text');
+        $this->app['config']->set('lauthz.second.model.config_text', $text);
     }
 
     protected function initTable()
