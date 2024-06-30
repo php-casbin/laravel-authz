@@ -277,6 +277,16 @@ Route::group(['middleware' => ['http_request']], function () {
 });
 ```
 
+### Using Gates
+
+You can use Laravel Gates to check if a user has a permission, provided that you have set an existing user instance as the currently authenticated user using `Auth::login`. See [Gates](https://laravel.com/docs/11.x/authorization#gates) for more details.
+
+```php
+if(Gate::allows('enforcer', ['articles', 'read'])) {
+    // The user can read articles
+};
+```
+
 ### Multiple enforcers
 
 If you need multiple permission controls in your project, you can configure multiple enforcers.

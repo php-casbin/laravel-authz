@@ -2,9 +2,10 @@
 
 namespace Lauthz;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use Lauthz\Contracts\ModelLoader;
-use Lauthz\Loaders\ModelLoaderFactory;
+use Lauthz\Facades\Enforcer;
+use Lauthz\Loaders\LoaderManager;
 use Lauthz\Models\Rule;
 use Lauthz\Observers\RuleObserver;
 
@@ -53,8 +54,28 @@ class LauthzServiceProvider extends ServiceProvider
             return new EnforcerManager($app);
         });
 
-        $this->app->bind(ModelLoader::class, function($app, $config) {
-            return ModelLoaderFactory::createFromConfig($config);
+        $this->app->singleton(LoaderManager::class, function ($app) {
+            return new LoaderManager($app);
+        });
+
+        $this->registerGates();
+    }
+
+    /**
+     * Register a gate that allows users to use Laravel's built-in Gate to call Enforcer.
+     *
+     * @return void
+     */
+    protected function registerGates()
+    {
+        Gate::define('enforcer', function ($user, ...$args) {
+            $identifier = $user->getAuthIdentifier();
+            if (method_exists($user, 'getAuthzIdentifier')) {
+                $identifier = $user->getAuthzIdentifier();
+            }
+            $identifier = strval($identifier);
+
+            return Enforcer::enforce($identifier, ...$args);
         });
     }
 }
