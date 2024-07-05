@@ -309,7 +309,7 @@ class DatabaseAdapterTest extends TestCase
         $this->assertEquals([
             ['bob', 'data2', 'write']
         ], Enforcer::getPolicy());
-        
+
         // Filter
         $filter = new Filter(['v2'], ['read']);
         Enforcer::loadFilteredPolicy($filter);
