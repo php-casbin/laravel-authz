@@ -2,11 +2,9 @@
 
 namespace Lauthz;
 
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use Lauthz\Contracts\ModelLoader;
-use Lauthz\Facades\Enforcer;
-use Lauthz\Loaders\ModelLoaderFactory;
+use Lauthz\EnforcerLocalizer;
+use Lauthz\Loaders\ModelLoaderManager;
 use Lauthz\Models\Rule;
 use Lauthz\Observers\RuleObserver;
 
@@ -34,6 +32,8 @@ class LauthzServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/lauthz.php', 'lauthz');
 
         $this->bootObserver();
+
+        $this->registerLocalizer();
     }
 
     /**
@@ -55,11 +55,13 @@ class LauthzServiceProvider extends ServiceProvider
             return new EnforcerManager($app);
         });
 
-        $this->app->bind(ModelLoader::class, function($app, $config) {
-            return ModelLoaderFactory::createFromConfig($config);
+        $this->app->singleton(ModelLoaderManager::class, function ($app) {
+            return new ModelLoaderManager($app);
         });
 
-        $this->registerGates();
+        $this->app->singleton(EnforcerLocalizer::class, function ($app) {
+            return new EnforcerLocalizer($app);
+        });
     }
 
     /**
@@ -67,16 +69,8 @@ class LauthzServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerGates()
+    protected function registerLocalizer()
     {
-        Gate::define('enforcer', function ($user, ...$args) {
-            $identifier = $user->getAuthIdentifier();
-            if (method_exists($user, 'getAuthzIdentifier')) {
-                $identifier = $user->getAuthzIdentifier();
-            }
-            $identifier = strval($identifier);
-
-            return Enforcer::enforce($identifier, ...$args);
-        });
+        $this->app->make(EnforcerLocalizer::class)->register();
     }
 }

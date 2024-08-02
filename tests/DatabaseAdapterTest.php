@@ -2,10 +2,10 @@
 
 namespace Lauthz\Tests;
 
-use Enforcer;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Casbin\Persist\Adapters\Filter;
 use Casbin\Exceptions\InvalidFilterTypeException;
+use Lauthz\Facades\Enforcer;
 
 class DatabaseAdapterTest extends TestCase
 {
@@ -309,7 +309,7 @@ class DatabaseAdapterTest extends TestCase
         $this->assertEquals([
             ['bob', 'data2', 'write']
         ], Enforcer::getPolicy());
-        
+
         // Filter
         $filter = new Filter(['v2'], ['read']);
         Enforcer::loadFilteredPolicy($filter);

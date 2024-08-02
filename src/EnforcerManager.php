@@ -7,10 +7,10 @@ use Casbin\Enforcer;
 use Casbin\Model\Model;
 use Casbin\Log\Log;
 use Lauthz\Contracts\Factory;
-use Lauthz\Contracts\ModelLoader;
 use Lauthz\Models\Rule;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Lauthz\Loaders\ModelLoaderManager;
 
 /**
  * @mixin \Casbin\Enforcer
@@ -87,7 +87,8 @@ class EnforcerManager implements Factory
         }
 
         $model = new Model();
-        $loader = $this->app->make(ModelLoader::class, $config);
+        $loader = $this->app->make(ModelLoaderManager::class);
+        $loader->initFromConfig($config);
         $loader->loadModel($model);
 
         $adapter = Arr::get($config, 'adapter');
