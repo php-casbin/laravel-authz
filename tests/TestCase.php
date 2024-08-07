@@ -27,9 +27,9 @@ abstract class TestCase extends BaseTestCase
         });
 
         $this->app->make(Kernel::class)->bootstrap();
+        $this->initConfig();
 
         $this->app->register(\Lauthz\LauthzServiceProvider::class);
-        $this->initConfig();
 
         $this->artisan('vendor:publish', ['--provider' => 'Lauthz\LauthzServiceProvider']);
         $this->artisan('migrate', ['--force' => true]);

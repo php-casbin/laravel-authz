@@ -6,6 +6,14 @@ return [
      */
     'default' => 'basic',
 
+    /*
+     * Lauthz Localizer
+     */
+    'localizer' => [
+        // changes whether enforcer will register at gates.
+        'enabled_register_at_gates' => true
+    ],
+
     'basic' => [
         /*
         * Casbin model setting.

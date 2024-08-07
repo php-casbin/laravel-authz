@@ -2,10 +2,10 @@
 
 namespace Lauthz\Tests;
 
-use Enforcer;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Casbin\Persist\Adapters\Filter;
 use Casbin\Exceptions\InvalidFilterTypeException;
+use Lauthz\Facades\Enforcer;
 
 class DatabaseAdapterTest extends TestCase
 {

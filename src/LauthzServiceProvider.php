@@ -3,6 +3,7 @@
 namespace Lauthz;
 
 use Illuminate\Support\ServiceProvider;
+use Lauthz\EnforcerLocalizer;
 use Lauthz\Loaders\ModelLoaderManager;
 use Lauthz\Models\Rule;
 use Lauthz\Observers\RuleObserver;
@@ -31,6 +32,8 @@ class LauthzServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/lauthz.php', 'lauthz');
 
         $this->bootObserver();
+
+        $this->registerLocalizer();
     }
 
     /**
@@ -55,5 +58,19 @@ class LauthzServiceProvider extends ServiceProvider
         $this->app->singleton(ModelLoaderManager::class, function ($app) {
             return new ModelLoaderManager($app);
         });
+
+        $this->app->singleton(EnforcerLocalizer::class, function ($app) {
+            return new EnforcerLocalizer($app);
+        });
+    }
+
+    /**
+     * Register a gate that allows users to use Laravel's built-in Gate to call Enforcer.
+     *
+     * @return void
+     */
+    protected function registerLocalizer()
+    {
+        $this->app->make(EnforcerLocalizer::class)->register();
     }
 }
