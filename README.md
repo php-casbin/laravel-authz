@@ -8,7 +8,7 @@
 
 <p align="center">
     <a href="https://github.com/php-casbin/laravel-authz/actions">
-        <img src="https://github.com/php-casbin/laravel-authz/workflows/build/badge.svg?branch=master" alt="Build Status">
+        <img src="https://github.com/php-casbin/laravel-authz/actions/workflows/build.yml/badge.svg?branch=master" alt="Build Status">
     </a>
     <a href="https://coveralls.io/github/php-casbin/laravel-authz">
         <img src="https://coveralls.io/repos/github/php-casbin/laravel-authz/badge.svg" alt="Coverage Status">
@@ -35,6 +35,7 @@ All you need to learn to use `Casbin` first.
   * [Using a middleware](#using-a-middleware)
     * [basic Enforcer Middleware](#basic-enforcer-middleware)
     * [HTTP Request Middleware ( RESTful is also supported )](#http-request-middleware--restful-is-also-supported-)
+  * [Using Gates](#using-gates)
   * [Multiple enforcers](#multiple-enforcers)
   * [Using artisan commands](#using-artisan-commands)
   * [Cache](#using-cache)
