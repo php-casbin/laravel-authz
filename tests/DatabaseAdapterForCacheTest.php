@@ -2,11 +2,9 @@
 
 namespace Lauthz\Tests;
 
-use Enforcer;
 use Lauthz\Models\Rule;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Casbin\Persist\Adapters\Filter;
-use Casbin\Exceptions\InvalidFilterTypeException;
+use Lauthz\Facades\Enforcer;
 
 class DatabaseAdapterForCacheTest extends TestCase
 {
