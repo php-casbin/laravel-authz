@@ -2,10 +2,10 @@
 
 namespace Lauthz;
 
-use Casbin\Bridge\Logger\LoggerBridge;
 use Casbin\Enforcer;
 use Casbin\Model\Model;
 use Casbin\Log\Log;
+use Casbin\Log\Logger\DefaultLogger;
 use Lauthz\Contracts\Factory;
 use Lauthz\Models\Rule;
 use Illuminate\Support\Arr;
@@ -80,10 +80,10 @@ class EnforcerManager implements Factory
 
         if ($logger = Arr::get($config, 'log.logger')) {
             if (is_string($logger)) {
-                $logger = $this->app->make($logger);
+                $logger = new DefaultLogger($this->app->make($logger));
             }
 
-            Log::setLogger(new LoggerBridge($logger));
+            Log::setLogger($logger);
         }
 
         $model = new Model();
@@ -98,7 +98,7 @@ class EnforcerManager implements Factory
             ]);
         }
 
-        return new Enforcer($model, $adapter, Arr::get($config, 'log.enabled', false));
+        return new Enforcer($model, $adapter, $logger, Arr::get($config, 'log.enabled', false));
     }
 
     /**
