@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @see \Casbin\Enforcer
+ * @method static string[] getAllRoles()
  * @method static string[] getRolesForUser(string $name, string ...$domain)
  * @method static string[] getUsersForRole(string $name, string ...$domain)
  * @method static bool hasRoleForUser(string $name, string $role, string ...$domain)
