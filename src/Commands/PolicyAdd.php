@@ -33,7 +33,7 @@ class PolicyAdd extends Command
     public function handle()
     {
         $params = explode(',', $this->argument('policy'));
-        array_walk($params, function (&$value) {
+        array_walk($params, static function (&$value): void {
             $value = trim($value);
         });
         $ret = Enforcer::addPolicy(...$params);

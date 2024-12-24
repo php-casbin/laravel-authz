@@ -8,6 +8,7 @@ use Casbin\Log\Log;
 use Casbin\Log\Logger\DefaultLogger;
 use Lauthz\Contracts\Factory;
 use Lauthz\Models\Rule;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Lauthz\Loaders\ModelLoaderManager;
@@ -20,23 +21,23 @@ class EnforcerManager implements Factory
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \
      */
-    protected $app;
+    protected Application $app;
 
     /**
      * The array of created "guards".
      *
      * @var array
      */
-    protected $guards = [];
+    protected array $guards = [];
 
     /**
      * Create a new manager instance.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      */
-    public function __construct($app)
+    public function __construct(Application $app)
     {
         $this->app = $app;
     }

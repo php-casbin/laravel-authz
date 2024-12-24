@@ -61,9 +61,7 @@ class Rule extends Model
      */
     public function getAllFromCache()
     {
-        $get = function () {
-            return $this->select('ptype', 'v0', 'v1', 'v2', 'v3', 'v4', 'v5')->get()->toArray();
-        };
+        $get = fn () => $this->select('ptype', 'v0', 'v1', 'v2', 'v3', 'v4', 'v5')->get()->toArray();
         if (!$this->config('cache.enabled', false)) {
             return $get();
         }

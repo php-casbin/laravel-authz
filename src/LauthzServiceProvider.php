@@ -51,17 +51,11 @@ class LauthzServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('enforcer', function ($app) {
-            return new EnforcerManager($app);
-        });
+        $this->app->singleton('enforcer', fn ($app) => new EnforcerManager($app));
 
-        $this->app->singleton(ModelLoaderManager::class, function ($app) {
-            return new ModelLoaderManager($app);
-        });
+        $this->app->singleton(ModelLoaderManager::class, fn ($app) => new ModelLoaderManager($app));
 
-        $this->app->singleton(EnforcerLocalizer::class, function ($app) {
-            return new EnforcerLocalizer($app);
-        });
+        $this->app->singleton(EnforcerLocalizer::class, fn ($app) => new EnforcerLocalizer($app));
     }
 
     /**

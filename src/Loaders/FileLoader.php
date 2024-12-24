@@ -13,7 +13,7 @@ class FileLoader implements ModelLoader
      *
      * @var string
      */
-    private $filePath;
+    private string $filePath;
 
     /**
      * Constructor to initialize the file path.
