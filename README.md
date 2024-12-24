@@ -8,7 +8,7 @@
 
 <p align="center">
     <a href="https://github.com/php-casbin/laravel-authz/actions">
-        <img src="https://github.com/php-casbin/laravel-authz/actions/workflows/build.yml/badge.svg?branch=master" alt="Build Status">
+        <img src="https://github.com/php-casbin/laravel-authz/actions/workflows/phpunit.yml/badge.svg" alt="PHPUnit Status">
     </a>
     <a href="https://coveralls.io/github/php-casbin/laravel-authz">
         <img src="https://coveralls.io/repos/github/php-casbin/laravel-authz/badge.svg" alt="Coverage Status">
