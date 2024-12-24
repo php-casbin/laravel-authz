@@ -14,7 +14,6 @@ use Casbin\Model\Model;
 use Casbin\Persist\AdapterHelper;
 use DateTime;
 use Casbin\Exceptions\InvalidFilterTypeException;
-use Illuminate\Support\Facades\DB;
 
 /**
  * DatabaseAdapter.
@@ -28,14 +27,14 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
     /**
      * @var bool
      */
-    private $filtered = false;
+    private bool $filtered = false;
 
     /**
      * Rules eloquent model.
      *
      * @var Rule
      */
-    protected $eloquent;
+    protected Rule $eloquent;
 
     /**
      * the DatabaseAdapter constructor.
@@ -331,10 +330,8 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
         }
         $rows = $instance->get()->makeHidden(['created_at','updated_at', 'id'])->toArray();
         foreach ($rows as $row) {
-            $row = array_filter($row, function($value) { return !is_null($value) && $value !== ''; });
-            $line = implode(', ', array_filter($row, function ($val) {
-                return '' != $val && !is_null($val);
-            }));
+            $row = array_filter($row, static fn($value): bool => !is_null($value) && $value !== '');
+            $line = implode(', ', array_filter($row, static fn ($val): bool => '' != $val && !is_null($val)));
             $this->loadPolicyLine(trim($line), $model);
         }
         $this->setFiltered(true);

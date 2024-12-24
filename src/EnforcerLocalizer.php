@@ -4,6 +4,7 @@ namespace Lauthz;
 
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Application;
 use Lauthz\Facades\Enforcer;
 
 class EnforcerLocalizer
@@ -11,16 +12,16 @@ class EnforcerLocalizer
     /**
      * The application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var Application
      */
-    protected $app;
+    protected Application $app;
 
     /**
      * Create a new localizer instance.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      */
-    public function __construct($app)
+    public function __construct(Application $app)
     {
         $this->app = $app;
     }

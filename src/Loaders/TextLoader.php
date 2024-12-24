@@ -13,7 +13,7 @@ class TextLoader implements ModelLoader
      *
      * @var string
      */
-    private $text;
+    private string $text;
 
     /**
      * Constructor to initialize the model text.

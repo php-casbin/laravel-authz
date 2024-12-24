@@ -14,7 +14,7 @@ class UrlLoader implements ModelLoader
      *
      * @var string
      */
-    private $url;
+    private string $url;
 
     /**
      * Constructor to initialize the url path.
