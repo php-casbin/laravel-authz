@@ -46,6 +46,9 @@ jobs:
           - php: 8.3
             laravel: 11.*
             phpunit: ~10.5
+          - php: 8.4
+            laravel: 11.*
+            phpunit: ~10.5
             
     name: Laravel${{ matrix.laravel }}-PHP${{ matrix.php }}
 
