@@ -123,6 +123,13 @@ if (Enforcer::enforce("eve", "articles", "edit")) {
 
 ```
 
+By default, [Gate](https://laravel.com/docs/11.x/authorization#gates) checks will be automatically intercepted
+. You can check if a user has a permission with Laravel's default `can` function:
+
+```php
+$user->can('articles,read');
+```
+
 ### Using Enforcer Api
 
 It provides a very rich api to facilitate various operations on the Policy:
