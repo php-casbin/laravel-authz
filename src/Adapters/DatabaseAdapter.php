@@ -14,6 +14,7 @@ use Casbin\Model\Model;
 use Casbin\Persist\AdapterHelper;
 use DateTime;
 use Casbin\Exceptions\InvalidFilterTypeException;
+use Throwable;
 
 /**
  * DatabaseAdapter.
@@ -182,6 +183,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      * @param string $sec
      * @param string $ptype
      * @param string[][] $rules
+     * @throws Throwable
      */
     public function removePolicies(string $sec, string $ptype, array $rules): void
     {
@@ -229,11 +231,12 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      * RemoveFilteredPolicy removes policy rules that match the filter from the storage.
      * This is part of the Auto-Save feature.
      *
-     * @param string      $sec
-     * @param string      $ptype
-     * @param int         $fieldIndex
+     * @param string $sec
+     * @param string $ptype
+     * @param int $fieldIndex
      * @param string|null ...$fieldValues
      * @return void
+     * @throws Throwable
      */
     public function removeFilteredPolicy(string $sec, string $ptype, int $fieldIndex, ?string ...$fieldValues): void
     {
@@ -276,6 +279,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      * @param string[][] $oldRules
      * @param string[][] $newRules
      * @return void
+     * @throws Throwable
      */
     public function updatePolicies(string $sec, string $ptype, array $oldRules, array $newRules): void
     {
@@ -295,6 +299,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      * @param integer $fieldIndex
      * @param string ...$fieldValues
      * @return array
+     * @throws Throwable
      */
     public function updateFilteredPolicies(string $sec, string $ptype, array $newPolicies, int $fieldIndex, string ...$fieldValues): array
     {
@@ -311,6 +316,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      *
      * @param Model $model
      * @param mixed $filter
+     * @throws InvalidFilterTypeException
      */
     public function loadFilteredPolicy(Model $model, $filter): void
     {
