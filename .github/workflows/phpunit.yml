@@ -27,18 +27,10 @@ jobs:
         #        laravel: [ ]
         #        stability: [ prefer-lowest, prefer-stable ]
         include:
-          # Laravel 8.x
-          - php: 8.0
-            laravel: 8.*
-            phpunit: ~9.0
-          # Laravel 9.x
-          - php: 8.0
-            laravel: 9.*
-            phpunit: ~9.0
           # Laravel 10.x
           - php: 8.1
             laravel: 10.*
-            phpunit: ~9.0
+            phpunit: ~10.5
           # Laravel 11.x
           - php: 8.2
             laravel: 11.*
@@ -91,12 +83,7 @@ jobs:
           composer install --prefer-dist --no-progress --no-suggest
 
       - name: Run test suite
-        if: matrix.laravel != '11.*' && matrix.laravel != '12.*'
         run: ./vendor/bin/phpunit
-
-      - name: Run test suite laravel 11
-        if: matrix.laravel == '11.*' || matrix.laravel == '12.*'
-        run: ./vendor/bin/phpunit -c phpunit.10.xml
 
       - name: Run Coveralls
         env:
