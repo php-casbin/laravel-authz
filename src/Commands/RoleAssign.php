@@ -38,6 +38,8 @@ class RoleAssign extends Command
         $role = $this->argument('role');
         $ptype = $this->option('ptype') ?: 'g';
 
+        assert(is_string($user) && is_string($role) && is_string($ptype));
+
         $ret = Enforcer::addNamedGroupingPolicy($ptype, $user, $role);
         if ($ret) {
             $this->info('Added `'.$role.'` role to `'.$user.'` successfully');

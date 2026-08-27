@@ -18,7 +18,7 @@ class RequestMiddleware
      *
      * @param \Illuminate\Http\Request $request
      * @param \Closure                 $next
-     * @param mixed                    ...$guards
+     * @param string                   ...$guards
      *
      * @return mixed
      */
@@ -36,14 +36,18 @@ class RequestMiddleware
     /**
      * Determine if the user is authorized in to any of the given guards.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param array                    $guards
+     * @param \Illuminate\Http\Request      $request
+     * @param array<int|string, string>     $guards
      *
      * @throws \Lauthz\Exceptions\UnauthorizedException
      */
-    protected function authorize(Request $request, array $guards)
+    protected function authorize(Request $request, array $guards): void
     {
         $user = Auth::user();
+        if (!$user) {
+            throw new UnauthorizedException();
+        }
+
         $identifier = $user->getAuthIdentifier();
         if (method_exists($user, 'getAuthzIdentifier')) {
             $identifier = $user->getAuthzIdentifier();
@@ -58,7 +62,8 @@ class RequestMiddleware
 
         foreach ($guards as $guard) {
             if (Enforcer::guard($guard)->enforce($identifier, $request->getPathInfo(), $request->method())) {
-                return Enforcer::shouldUse($guard);
+                Enforcer::shouldUse($guard);
+                return;
             }
         }
 

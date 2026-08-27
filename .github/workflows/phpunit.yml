@@ -23,44 +23,22 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        #        php: [ ]
-        #        laravel: [ ]
-        #        stability: [ prefer-lowest, prefer-stable ]
         include:
           # Laravel 10.x
-          - php: 8.1
-            laravel: 10.*
-            phpunit: ~10.5
+          - { php: '8.1', laravel: '10.*', testbench: '8.*' }
           # Laravel 11.x
-          - php: 8.2
-            laravel: 11.*
-            phpunit: ~10.5
-          - php: 8.3
-            laravel: 11.*
-            phpunit: ~10.5
-          - php: 8.4
-            laravel: 11.*
-            phpunit: ~10.5
+          - { php: '8.2', laravel: '11.*', testbench: '9.*' }
+          - { php: '8.3', laravel: '11.*', testbench: '9.*' }
+          - { php: '8.4', laravel: '11.*', testbench: '9.*' }
           # Laravel 12.x
-          - php: 8.2
-            laravel: 12.*
-            phpunit: ~11.5
-          - php: 8.3
-            laravel: 12.*
-            phpunit: ~11.5
-          - php: 8.4
-            laravel: 12.*
-            phpunit: ~11.5
+          - { php: '8.2', laravel: '12.*', testbench: '10.*' }
+          - { php: '8.3', laravel: '12.*', testbench: '10.*' }
+          - { php: '8.4', laravel: '12.*', testbench: '10.*' }
+          - { php: '8.5', laravel: '12.*', testbench: '10.*' }
           # Laravel 13.x
-          - php: 8.3
-            laravel: 13.*
-            phpunit: ~11.5
-          - php: 8.4
-            laravel: 13.*
-            phpunit: ~11.5
-          - php: 8.5
-            laravel: 13.*
-            phpunit: ~11.5
+          - { php: '8.3', laravel: '13.*', testbench: '11.*' }
+          - { php: '8.4', laravel: '13.*', testbench: '11.*' }
+          - { php: '8.5', laravel: '13.*', testbench: '11.*' }
 
     name: Laravel${{ matrix.laravel }}-PHP${{ matrix.php }}
 
@@ -79,13 +57,23 @@ jobs:
         run: composer validate
 
       - name: Install dependencies
-        if: steps.composer-cache.outputs.cache-hit != 'true'
         run: |
-          composer require laravel/framework:${{ matrix.laravel }} --no-update --no-interaction
-          composer require laravel/laravel:${{ matrix.laravel }} phpunit/phpunit:${{ matrix.phpunit }} --no-update --no-interaction --dev
-          composer install --prefer-dist --no-progress --no-suggest
+          composer config policy.advisories.block false
+          composer require "orchestra/testbench:${{ matrix.testbench }}" --dev --no-update --no-interaction
+          composer update --prefer-dist --no-progress --no-interaction
 
-      - name: Run test suite
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse --no-progress
+
+      - name: Run test suite (SQLite)
+        run: ./vendor/bin/phpunit
+
+      - name: Run test suite (MySQL)
+        env:
+          DB_CONNECTION: mysql
+          DB_DATABASE: lauthz
+          DB_USERNAME: root
+          DB_PASSWORD: ""
         run: ./vendor/bin/phpunit
 
       - name: Run Coveralls

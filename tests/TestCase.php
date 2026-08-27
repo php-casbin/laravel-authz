@@ -2,52 +2,101 @@
 
 namespace Lauthz\Tests;
 
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Orchestra\Testbench\TestCase as BaseTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Lauthz\Exceptions\UnauthorizedException;
+use Lauthz\Facades\Enforcer;
+use Lauthz\LauthzServiceProvider;
 use Lauthz\Models\Rule;
 use Lauthz\Tests\Models\User;
 
 abstract class TestCase extends BaseTestCase
 {
+    use RefreshDatabase;
+
     /**
-     * Creates the application.
+     * Get package providers.
      *
-     * @return \Illuminate\Foundation\Application
+     * @param \Illuminate\Foundation\Application $app
+     * @return array<int, class-string<\Illuminate\Support\ServiceProvider>>
      */
-    public function createApplication()
+    protected function getPackageProviders($app)
     {
-        $this->app = require __DIR__.'/../vendor/laravel/laravel/bootstrap/app.php';
+        return [
+            LauthzServiceProvider::class,
+        ];
+    }
 
-        $this->app->booting(function () {
-            $loader = \Illuminate\Foundation\AliasLoader::getInstance();
-            $loader->alias('Enforcer', \Lauthz\Facades\Enforcer::class);
-        });
+    /**
+     * Get package aliases.
+     *
+     * @param \Illuminate\Foundation\Application $app
+     * @return array<string, class-string<\Illuminate\Support\Facades\Facade>>
+     */
+    protected function getPackageAliases($app)
+    {
+        return [
+            'Enforcer' => Enforcer::class,
+        ];
+    }
 
-        $this->app->make(Kernel::class)->bootstrap();
+    /**
+     * Define environment setup.
+     *
+     * @param \Illuminate\Foundation\Application $app
+     * @return void
+     */
+    protected function defineEnvironment($app)
+    {
+        $this->app = $app;
+        $config = require __DIR__ . '/../config/lauthz.php';
+        $app['config']->set('lauthz', $config);
+        if ($app['config']->get('database.default') === 'mysql') {
+            $app['config']->set('database.connections.mysql.charset', 'utf8');
+            $app['config']->set('database.connections.mysql.collation', 'utf8_unicode_ci');
+        }
         $this->initConfig();
-
-        $this->app->register(\Lauthz\LauthzServiceProvider::class);
-
-        $this->artisan('vendor:publish', ['--provider' => 'Lauthz\LauthzServiceProvider']);
-        $this->artisan('migrate', ['--force' => true]);
-
-        $this->afterApplicationCreated(function () {
-            $this->initTable();
-        });
-
-        return $this->app;
     }
 
     protected function initConfig()
     {
-        $this->app['config']->set('database.default', 'mysql');
-        $this->app['config']->set('database.connections.mysql.charset', 'utf8');
-        $this->app['config']->set('database.connections.mysql.collation', 'utf8_unicode_ci');
-        $this->app['config']->set('cache.default', 'array');
-        // $app['config']->set('lauthz.log.enabled', true);
+    }
+
+    /**
+     * Define database migrations.
+     *
+     * @return void
+     */
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+    }
+
+    /**
+     * The parameters to use with the migrate:fresh command.
+     *
+     * @return array<string, mixed>
+     */
+    protected function migrateFreshUsing()
+    {
+        return [
+            '--path' => realpath(__DIR__ . '/../database/migrations'),
+            '--realpath' => true,
+        ];
+    }
+
+    /**
+     * Setup the test environment.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->initTable();
     }
 
     protected function initTable()
@@ -76,12 +125,12 @@ abstract class TestCase extends BaseTestCase
         return 'Exception';
     }
 
-    protected function login($name)
+    protected function login($name): void
     {
         Auth::login($this->user($name));
     }
 
-    protected function user($name)
+    protected function user($name): User
     {
         $user = new User();
         $user->name = $name;

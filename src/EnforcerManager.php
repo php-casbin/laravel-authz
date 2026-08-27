@@ -21,14 +21,14 @@ class EnforcerManager implements Factory
     /**
      * The application instance.
      *
-     * @var \
+     * @var Application
      */
     protected Application $app;
 
     /**
      * The array of created "guards".
      *
-     * @var array
+     * @var array<string, \Casbin\Enforcer>
      */
     protected array $guards = [];
 
@@ -45,7 +45,7 @@ class EnforcerManager implements Factory
     /**
      * Attempt to get the enforcer from the local cache.
      *
-     * @param string $name
+     * @param string|null $name
      *
      * @return \Casbin\Enforcer
      *
@@ -107,7 +107,7 @@ class EnforcerManager implements Factory
      *
      * @param string $name
      *
-     * @return array
+     * @return array<string, mixed>|null
      */
     protected function getConfig($name)
     {
@@ -127,9 +127,9 @@ class EnforcerManager implements Factory
     /**
      * Set the default guard driver the factory should serve.
      *
-     * @param string $name
+     * @param string|null $name
      */
-    public function shouldUse($name)
+    public function shouldUse($name = null): void
     {
         $name = $name ?: $this->getDefaultGuard();
 
@@ -141,7 +141,7 @@ class EnforcerManager implements Factory
      *
      * @param string $name
      */
-    public function setDefaultGuard($name)
+    public function setDefaultGuard($name): void
     {
         $this->app['config']['lauthz.default'] = $name;
     }
@@ -150,7 +150,7 @@ class EnforcerManager implements Factory
      * Dynamically call the default driver instance.
      *
      * @param string $method
-     * @param array  $parameters
+     * @param array<int, mixed>  $parameters
      *
      * @return mixed
      */

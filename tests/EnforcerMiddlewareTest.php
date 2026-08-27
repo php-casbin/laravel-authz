@@ -3,13 +3,10 @@
 namespace Lauthz\Tests;
 
 use Lauthz\Middlewares\EnforcerMiddleware;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Request;
 
 class EnforcerMiddlewareTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testNotLogin()
     {
         $this->assertEquals($this->middleware('data1', 'read'), 'Unauthorized Exception');

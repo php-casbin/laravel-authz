@@ -4,13 +4,10 @@ namespace Lauthz\Tests\Commands;
 
 use Lauthz\Facades\Enforcer;
 use Lauthz\Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Artisan;
 
 class PolicyAddTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testHandle()
     {
         $this->assertFalse(Enforcer::enforce('eve', 'articles', 'read'));
