@@ -29,9 +29,9 @@ class EnforcerLocalizer
     /**
      * Register the localizer based on the configuration.
      */
-    public function register()
+    public function register(): void
     {
-        if ($this->app->config->get('lauthz.localizer.enabled_register_at_gates')) {
+        if ($this->app['config']->get('lauthz.localizer.enabled_register_at_gates')) {
             $this->registerAtGate();
         }
     }
@@ -39,13 +39,11 @@ class EnforcerLocalizer
     /**
      * Register the localizer at the gate.
      */
-    protected function registerAtGate()
+    protected function registerAtGate(): void
     {
         $this->app->make(Gate::class)->before(function (Authorizable $user, string $ability, array $guards) {
-            /** @var \Illuminate\Contracts\Auth\Authenticatable $user */
-            $identifier = $user->getAuthIdentifier();
+            $identifier = $user instanceof \Illuminate\Contracts\Auth\Authenticatable ? $user->getAuthIdentifier() : null;
             if (method_exists($user, 'getAuthzIdentifier')) {
-                /** @var \Lauthz\Tests\Models\User $user */
                 $identifier = $user->getAuthzIdentifier();
             }
             $identifier = strval($identifier);

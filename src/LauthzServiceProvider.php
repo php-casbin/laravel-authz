@@ -13,7 +13,7 @@ class LauthzServiceProvider extends ServiceProvider
     /**
      * Perform post-registration booting of services.
      */
-    public function boot()
+    public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([__DIR__ . '/../database/migrations' => database_path('migrations')], 'laravel-lauthz-migrations');
@@ -41,7 +41,7 @@ class LauthzServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function bootObserver()
+    protected function bootObserver(): void
     {
         Rule::observe(new RuleObserver());
     }
@@ -49,7 +49,7 @@ class LauthzServiceProvider extends ServiceProvider
     /**
      * Register bindings in the container.
      */
-    public function register()
+    public function register(): void
     {
         $this->app->singleton('enforcer', fn ($app) => new EnforcerManager($app));
 

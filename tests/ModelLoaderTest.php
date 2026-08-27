@@ -90,7 +90,7 @@ class ModelLoaderTest extends TestCase
         $this->app['config']->set('lauthz.basic.model.config_type', 'url');
         $this->app['config']->set(
             'lauthz.basic.model.config_url',
-            'https://raw.githubusercontent.com/casbin/casbin/master/examples/rbac_model.conf'
+            'file://' . realpath(__DIR__ . '/../config/lauthz-rbac-model.conf')
         );
     }
 

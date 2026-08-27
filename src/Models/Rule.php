@@ -7,13 +7,22 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Rule Model.
+ *
+ * @mixin \Illuminate\Database\Eloquent\Builder<Rule>
+ * @property string $ptype
+ * @property string $v0
+ * @property string $v1
+ * @property string $v2
+ * @property string $v3
+ * @property string $v4
+ * @property string $v5
  */
 class Rule extends Model
 {
     /**
      * a cache store.
      *
-     * @var \Illuminate\Cache\Repository
+     * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $store;
 
@@ -27,14 +36,14 @@ class Rule extends Model
     /**
      * Fillable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = ['ptype', 'v0', 'v1', 'v2', 'v3', 'v4', 'v5'];
 
     /**
      * Create a new Eloquent model instance.
      *
-     * @param array  $attributes
+     * @param array<string, mixed>  $attributes
      * @param string $guard
      */
     public function __construct(array $attributes = [], $guard = '')
@@ -57,9 +66,9 @@ class Rule extends Model
     /**
      * Gets rules from caches.
      *
-     * @return mixed
+     * @return array<int, array<string, mixed>>
      */
-    public function getAllFromCache()
+    public function getAllFromCache(): array
     {
         $get = fn () => $this->select('ptype', 'v0', 'v1', 'v2', 'v3', 'v4', 'v5')->get()->toArray();
         if (!$this->config('cache.enabled', false)) {
@@ -72,7 +81,7 @@ class Rule extends Model
     /**
      * Refresh Cache.
      */
-    public function refreshCache()
+    public function refreshCache(): void
     {
         if (!$this->config('cache.enabled', false)) {
             return;
@@ -85,7 +94,7 @@ class Rule extends Model
     /**
      * Forget Cache.
      */
-    public function forgetCache()
+    public function forgetCache(): void
     {
         $this->store->forget($this->config('cache.key'));
     }
@@ -93,7 +102,7 @@ class Rule extends Model
     /**
      * Init cache.
      */
-    protected function initCache()
+    protected function initCache(): void
     {
         $store = $this->config('cache.store', 'default');
         $store = 'default' == $store ? null : $store;
@@ -101,10 +110,22 @@ class Rule extends Model
     }
 
     /**
+     * Fire a model event for the given model.
+     *
+     * @param string $event
+     * @param bool $halt
+     * @return mixed
+     */
+    public function fireModelEvent($event, $halt = true)
+    {
+        return parent::fireModelEvent($event, $halt);
+    }
+
+    /**
      * Gets config value by key.
      *
-     * @param string $key
-     * @param string $default
+     * @param string|null $key
+     * @param mixed $default
      *
      * @return mixed
      */

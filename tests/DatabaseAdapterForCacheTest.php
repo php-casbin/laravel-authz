@@ -3,14 +3,10 @@
 namespace Lauthz\Tests;
 
 use Lauthz\Models\Rule;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Lauthz\Facades\Enforcer;
 
 class DatabaseAdapterForCacheTest extends TestCase
 {
-
-    use DatabaseMigrations;
-
     public function testAddPolicy()
     {
         $this->enableCache();

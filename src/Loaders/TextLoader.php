@@ -18,7 +18,7 @@ class TextLoader implements ModelLoader
     /**
      * Constructor to initialize the model text.
      *
-     * @param array $config
+     * @param array<string, mixed> $config
      */
     public function __construct(array $config)
     {

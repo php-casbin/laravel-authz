@@ -20,6 +20,8 @@ use InvalidArgumentException;
  *  - UrlLoader: Handles model loading from URL.
  *
  *  To utilize a built-in or custom loader, set 'model.config_type' in the configuration to match one of the above types.
+ *
+ * @mixin \Lauthz\Contracts\ModelLoader
  */
 class ModelLoaderManager extends Manager
 {
@@ -27,18 +29,18 @@ class ModelLoaderManager extends Manager
     /**
      * The array of the lauthz driver configuration.
      * 
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $config;
+    protected array $loaderConfig = [];
 
     /**
      * Initialize configuration for the loader manager instance.
      *
-     * @param array $config the lauthz driver configuration.
+     * @param array<string, mixed> $config the lauthz driver configuration.
      */
-    public function initFromConfig(array $config)
+    public function initFromConfig(array $config): void
     {
-        $this->config = $config;
+        $this->loaderConfig = $config;
     }
 
     /**
@@ -48,7 +50,7 @@ class ModelLoaderManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return Arr::get($this->config, 'model.config_type', '');
+        return Arr::get($this->loaderConfig, 'model.config_type', '');
     }
 
     /**
@@ -58,7 +60,7 @@ class ModelLoaderManager extends Manager
      */
     public function createTextDriver()
     {
-        return new TextLoader($this->config);
+        return new TextLoader($this->loaderConfig);
     }
 
     /**
@@ -68,7 +70,7 @@ class ModelLoaderManager extends Manager
      */
     public function createUrlDriver()
     {
-        return new UrlLoader($this->config);
+        return new UrlLoader($this->loaderConfig);
     }
 
     /**
@@ -78,7 +80,7 @@ class ModelLoaderManager extends Manager
      */
     public function createFileDriver()
     {
-        return new FileLoader($this->config);
+        return new FileLoader($this->loaderConfig);
     }
 
     /**

@@ -1,14 +1,11 @@
 <?php
 
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Lauthz\Facades\Enforcer;
 use Lauthz\Tests\TestCase;
 
 class EnforcerLocalizerTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testRegisterAtGates()
     {
         $user = $this->user('alice');

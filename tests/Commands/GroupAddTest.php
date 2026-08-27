@@ -2,15 +2,12 @@
 
 namespace Lauthz\Tests\Commands;
 
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Artisan;
 use Lauthz\Facades\Enforcer;
 use Lauthz\Tests\TestCase;
 
 class GroupAddTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testHandle()
     {
         $this->assertFalse(Enforcer::hasGroupingPolicy('eve', 'writer', 'domain'));

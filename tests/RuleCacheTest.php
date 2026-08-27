@@ -2,14 +2,11 @@
 
 namespace Lauthz\Tests;
 
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Lauthz\Models\Rule;
 
 class RuleCacheTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testEnableCache()
     {
         $this->enableCache();

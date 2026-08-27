@@ -6,12 +6,12 @@ use Lauthz\Models\Rule;
 
 class RuleObserver
 {
-    public function saved(Rule $rule)
+    public function saved(Rule $rule): void
     {
         $rule->refreshCache();
     }
 
-    public function deleted(Rule $rule)
+    public function deleted(Rule $rule): void
     {
         $rule->refreshCache();
     }

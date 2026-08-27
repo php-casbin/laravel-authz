@@ -32,7 +32,9 @@ class GroupAdd extends Command
      */
     public function handle()
     {
-        $params = explode(',', $this->argument('policy'));
+        $policy = $this->argument('policy');
+        assert(is_string($policy));
+        $params = explode(',', $policy);
         array_walk($params, static function (&$value): void {
             $value = trim($value);
         });

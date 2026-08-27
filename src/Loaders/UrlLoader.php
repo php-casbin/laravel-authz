@@ -19,7 +19,7 @@ class UrlLoader implements ModelLoader
     /**
      * Constructor to initialize the url path.
      *
-     * @param array $config
+     * @param array<string, mixed> $config
      */
     public function __construct(array $config)
     {
@@ -48,8 +48,9 @@ class UrlLoader implements ModelLoader
         $response = @file_get_contents($this->url, false, $context);
         if ($response === false) {
             $error = error_get_last();
+            $message = $error['message'] ?? 'Unknown error';
             throw new RuntimeException(
-                "Failed to fetch remote model " . $this->url . ": " . $error['message']
+                "Failed to fetch remote model " . $this->url . ": " . $message
             );
         }
 

@@ -29,9 +29,12 @@ class EnforcerMiddleware
         }
 
         $user = Auth::user();
+        if (!$user) {
+            throw new UnauthorizedException();
+        }
+
         $identifier = $user->getAuthIdentifier();
         if (method_exists($user, 'getAuthzIdentifier')) {
-            /** @var \Lauthz\Tests\Models\User $user */
             $identifier = $user->getAuthzIdentifier();
         }
         $identifier = strval($identifier);

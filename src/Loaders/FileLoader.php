@@ -18,7 +18,7 @@ class FileLoader implements ModelLoader
     /**
      * Constructor to initialize the file path.
      *
-     * @param array $config
+     * @param array<string, mixed> $config
      */
     public function __construct(array $config)
     {

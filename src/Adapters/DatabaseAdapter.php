@@ -50,8 +50,8 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
     /**
      * Filter the rule.
      *
-     * @param array $rule
-     * @return array
+     * @param array<int|string, mixed> $rule
+     * @return array<int|string, mixed>
      */
     public function filterRule(array $rule): array
     {
@@ -59,7 +59,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
 
         $i = count($rule) - 1;
         for (; $i >= 0; $i--) {
-            if ($rule[$i] != '' && !is_null($rule[$i])) {
+            if ($rule[$i] !== '' && $rule[$i] !== null) {
                 break;
             }
         }
@@ -71,7 +71,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      * savePolicyLine function.
      *
      * @param string $ptype
-     * @param array  $rule
+     * @param array<int|string, mixed>  $rule
      */
     public function savePolicyLine(string $ptype, array $rule): void
     {
@@ -104,13 +104,13 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      */
     public function savePolicy(Model $model): void
     {
-        foreach ($model['p'] as $ptype => $ast) {
+        foreach ($model['p'] ?? [] as $ptype => $ast) {
             foreach ($ast->policy as $rule) {
                 $this->savePolicyLine($ptype, $rule);
             }
         }
 
-        foreach ($model['g'] as $ptype => $ast) {
+        foreach ($model['g'] ?? [] as $ptype => $ast) {
             foreach ($ast->policy as $rule) {
                 $this->savePolicyLine($ptype, $rule);
             }
@@ -123,7 +123,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      *
      * @param string $sec
      * @param string $ptype
-     * @param array  $rule
+     * @param array<int|string, mixed>  $rule
      */
     public function addPolicy(string $sec, string $ptype, array $rule): void
     {
@@ -150,11 +150,11 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
             foreach ($rule as $key => $value) {
                 $temp['v'.strval($key)] = $value;
             }
-            $cols[$i++] = $temp ?? [];
+            $cols[$i++] = $temp;
             $temp = [];
         }
         $this->eloquent->insert($cols);
-        Rule::fireModelEvent('saved');
+        $this->eloquent->fireModelEvent('saved');
     }
 
     /**
@@ -162,7 +162,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      *
      * @param string $sec
      * @param string $ptype
-     * @param array  $rule
+     * @param array<int|string, mixed>  $rule
      */
     public function removePolicy(string $sec, string $ptype, array $rule): void
     {
@@ -173,7 +173,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
         }
 
         $instance->delete();
-        Rule::fireModelEvent('deleted');
+        $this->eloquent->fireModelEvent('deleted');
     }
 
     /**
@@ -199,7 +199,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      * @param string      $ptype
      * @param int         $fieldIndex
      * @param string|null ...$fieldValues
-     * @return array
+     * @return array<int, array<int|string, mixed>>
      * @throws Throwable
      */
     public function _removeFilteredPolicy(string $sec, string $ptype, int $fieldIndex, ?string ...$fieldValues): array
@@ -222,7 +222,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
         }
 
         $instance->delete();
-        Rule::fireModelEvent('deleted');
+        $this->eloquent->fireModelEvent('deleted');
 
         return $removedRules;
     }
@@ -268,7 +268,7 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
             $update['v' . $k] = $v;
         }
         $instance->update($update);
-        Rule::fireModelEvent('saved');
+        $this->eloquent->fireModelEvent('saved');
     }
 
     /**
@@ -295,10 +295,10 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
      *
      * @param string $sec
      * @param string $ptype
-     * @param array $newPolicies
+     * @param string[][] $newPolicies
      * @param integer $fieldIndex
      * @param string ...$fieldValues
-     * @return array
+     * @return array<int, array<int|string, mixed>>
      * @throws Throwable
      */
     public function updateFilteredPolicies(string $sec, string $ptype, array $newPolicies, int $fieldIndex, string ...$fieldValues): array
@@ -323,10 +323,10 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
         $instance = $this->eloquent;
 
         if (is_string($filter)) {
+            /** @var literal-string $filter */
             $instance = $instance->whereRaw($filter);
         } else if ($filter instanceof Filter) {
             foreach($filter->p as $k => $v) {
-                $where[$v] = $filter->g[$k];
                 $instance = $instance->where($v, $filter->g[$k]);
             }
         } else if ($filter instanceof \Closure) {
@@ -336,8 +336,8 @@ class DatabaseAdapter implements DatabaseAdapterContract, BatchDatabaseAdapterCo
         }
         $rows = $instance->get()->makeHidden(['created_at','updated_at', 'id'])->toArray();
         foreach ($rows as $row) {
-            $row = array_filter($row, static fn($value): bool => !is_null($value) && $value !== '');
-            $line = implode(', ', array_filter($row, static fn ($val): bool => '' != $val && !is_null($val)));
+            $row = array_filter($row, static fn($value): bool => $value !== null && $value !== '');
+            $line = implode(', ', $row);
             $this->loadPolicyLine(trim($line), $model);
         }
         $this->setFiltered(true);

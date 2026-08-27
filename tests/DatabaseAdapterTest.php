@@ -2,15 +2,12 @@
 
 namespace Lauthz\Tests;
 
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Casbin\Persist\Adapters\Filter;
 use Casbin\Exceptions\InvalidFilterTypeException;
 use Lauthz\Facades\Enforcer;
 
 class DatabaseAdapterTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testEnforce()
     {
         $this->assertTrue(Enforcer::enforce('alice', 'data1', 'read'));
