@@ -75,7 +75,18 @@ class Rule extends Model
             return $get();
         }
 
-        return $this->store->remember($this->config('cache.key'), $this->config('cache.ttl'), $get);
+        return $this->store->remember($this->getCacheKey(), $this->config('cache.ttl'), $get);
+    }
+
+    /**
+     * Gets the cache key, scoped to the enforcer guard so that multiple
+     * enforcers never read or overwrite each other's cached rules.
+     *
+     * @return string
+     */
+    private function getCacheKey(): string
+    {
+        return $this->guard.':'.$this->config('cache.key', 'rules');
     }
 
     /**
@@ -96,7 +107,7 @@ class Rule extends Model
      */
     public function forgetCache(): void
     {
-        $this->store->forget($this->config('cache.key'));
+        $this->store->forget($this->getCacheKey());
     }
 
     /**
