@@ -60,7 +60,7 @@ return [
             // cache store
             'store' => 'default',
 
-            // cache Key
+            // cache Key (automatically prefixed with the enforcer guard name)
             'key' => 'rules',
 
             // ttl \DateTimeInterface|\DateInterval|int|null
