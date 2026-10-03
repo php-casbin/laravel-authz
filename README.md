@@ -230,7 +230,7 @@ Determines whether a user has a permission.
 Enforcer::hasPermissionForUser('eve', 'articles', 'read');  // true or false
 ```
 
-See [Casbin API](https://casbin.org/docs/management-api#reference) for more APIs.
+See [Casbin API](https://casbin.apache.org/docs/management-api/#reference) for more APIs.
 
 ### Using a middleware
 
@@ -384,7 +384,7 @@ Sets your own cache configs in Laravel's `config/lauthz.php`.
 
 ## Thinks
 
-[Casbin](https://github.com/php-casbin/php-casbin) in Laravel. You can find the full documentation of Casbin [on the website](https://casbin.org/).
+[Casbin](https://github.com/php-casbin/php-casbin) in Laravel. You can find the full documentation of Casbin [on the website](https://casbin.apache.org/).
 
 ## License
 
